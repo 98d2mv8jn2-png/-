@@ -322,7 +322,7 @@
     <div id="view-flashcard" class="hidden">
         <div class="quiz-topbar">
             <select id="select-card-scope" onchange="changeCardScope(this.value)" style="width:auto; padding:0.3rem 0.6rem; font-size:0.85rem; font-weight:700; border-radius:20px; border-color:#c7d2fe; background:var(--primary-light); color:var(--primary); outline:none; cursor:pointer;">
-                <option value="unmastered" selected>📚 僅未熟記題庫</option>
+                <option value="unmastered" selected>📚 僅未熟記題庫 (SRS動態複習)</option>
                 <option value="all">🌐 全部總題庫 (100題)</option>
                 <option value="part1">📌 第 01 - 50 題</option>
                 <option value="part2">📌 第 51 - 100 題</option>
@@ -370,9 +370,9 @@
 
         <!-- 🧠 SRS 間距重複自我評估按鈕 -->
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; margin-bottom: 0.5rem;" id="srs-box" class="hidden">
-            <button class="btn btn-danger" style="padding:0.5rem; font-size:0.85rem;" onclick="rateCard('hard')">🔴 不會 (重來)</button>
-            <button class="btn btn-warning" style="padding:0.5rem; font-size:0.85rem;" onclick="rateCard('mid')">🟡 模糊</button>
-            <button class="btn btn-success" style="padding:0.5rem; font-size:0.85rem;" onclick="rateCard('easy')">🟢 輕鬆 (熟記)</button>
+            <button class="btn btn-danger" style="padding:0.5rem; font-size:0.85rem;" onclick="rateCard('hard')">🔴 不會 (排回前端重練)</button>
+            <button class="btn btn-warning" style="padding:0.5rem; font-size:0.85rem;" onclick="rateCard('mid')">🟡 模糊 (稍後複習)</button>
+            <button class="btn btn-success" style="padding:0.5rem; font-size:0.85rem;" onclick="rateCard('easy')">🟢 輕鬆 (標記熟記)</button>
         </div>
 
         <!-- 🎛️ 人體工學底部操控懸浮列 -->
@@ -483,7 +483,7 @@ const RAW_QUESTIONS = [
     { no: 43, q: "國軍計畫預算制度之特性？", a: "（1）著重遠程規劃。（2）考量整體發展。（3）實施整合評估。（4）確立計畫結構。（5）強化授權加責。（6）建立單位成本。（7）運用資訊系統。" },
     { no: 44, q: "應備具之支出原始憑證，事實上無法取得時，應如何處置？", a: "由經辦人員填具支出證明單，書明不能取得之原因，陳經主管人員轉呈單位主官或其授權代簽人核准者，可憑以造具記帳憑證。" },
     { no: 45, q: "試述櫃存現金上限由何人訂定？應如何訂定？", a: "單位主官；由單位主官依現金安全考量及實際任務需要適宜核定，並應經常檢討調整及檢查，以維現金安全。" },
-    { no: 46, q: "政府支出憑證處理要點第5條規定，各機關支付款項所取得之統一發票（含電子發票證明聯）或依加值型及非加值型營業稅法規定掣發之普通收據，應記明事項為何？", a: "（1）營業人之名稱及其統一編號。（2）品名及總價.僅列代號者，應由經手人加註或擇要譯註品名。（3）開立日期。（4）機關名稱或統一編號。" },
+    { no: 46, q: "政府支出憑證處理要點第5條規定，各機關支付款項所取得之統一發票（含電子發票證明聯）或依加值型及非加值型營業稅法規定掣發之普通收據，應記明事項為何？", a: "（1）營業人之名稱及其統一編號。（2）品名及總價。僅列代號者，應由經手人加註或擇要譯註品名。（3）開立日期。（4）機關名稱或統一編號。" },
     { no: 47, q: "試述定額經費之支用規定？", a: "行政事務：因公執行單位或團體之事務及業務推展所需費用。部隊特別補助：單位主官為加強領導統御，發揮即時犒賞部屬之獎勵（含獎金、獎品）及購置慰問品等所需費用。" },
     { no: 48, q: "依政府支出憑證處理要點規範，何謂支出憑證？試述之。", a: "為證明支付事實所取得之收據、統一發票、表單或其他可資證明書據；另支出憑證如透過網路下載列印，應由經手人簽名。" },
     { no: 49, q: "試述廚餘處理方式？", a: "（1）尋商變賣：應與承商完成訂約，其變賣所得價款，應全數用於改善官兵伙食，不得移作他用並依「國軍各級單位現金會計作業規定」納入副食費科目登帳管理。（2）依一般廢棄物清理法規定：委託公、民營廢棄物清除、處理機構辦理回收之。" },
@@ -491,7 +491,7 @@ const RAW_QUESTIONS = [
     { no: 51, q: "依據政府支出憑證處理要點第4條，收據應記明事項為何？", a: "（1）受領事由。（2）實收數額。（3）機關名稱。（4）受領人之姓名或名稱、身分證明文件字號、營利事業或扣繳單位統一編號。（5）開立日期。（6）其他由各機關依其業務性質及實際需要增列之事項。" },
     { no: 52, q: "試論應計基礎之內涵？", a: "當交易及其他事項發生時，即予認列，記載於會計紀錄中，並在相關期間於財務報表表達，而不是在收到或支付現金時才認列的會計基礎。" },
     { no: 53, q: "軍費預算之執行及支付結報包括哪些項目？", a: "分配預算編造、預算分配、預算簽證支用、價款支付、憑證存管及預算保留作業。" },
-    { no: 54, q: "依決算法第23條，審計機關審核各機關或各基金決算，應注意哪六列事項？", a: "（1）違法失職或不當情事之有無。（2）預算數之超過或剩餘。（3）施政計畫、事業計畫或營業計畫已成與未成之程度。（4）經濟與不經濟之程度。（5）施政效能或營業效能之程度，及與同類機關或基金之比較。（6）其他有關決算事項。" },
+    { no: 54, q: "依決算法第23條，審計機關審核各機關或各基金決算，應注意哪六列事項？", a: "（1）違法失職/不當情事之有無。（2）預算數之超過或剩餘。（3）施政計畫、事業計畫或營業計畫已成與未成之程度。（4）經濟與不經濟之程度。（5）施政效能或營業效能之程度，及與同類機關或基金之比較。（6）其他有關決算事項。" },
     { no: 55, q: "依會計法第22條，會計報告分為哪2項？", a: "（1）靜態之會計報告：表示一定日期之財務狀況。（2）動態之會計報告：表示一定期間內之財務變動經過情形。" },
     { no: 56, q: "國軍財力指導之目的？", a: "研判本期程可獲國防財力，確定國防預算結構比例，律定各單位可資運用國防預算額度，提示政策指導，俾為兵力整建與5年施政計畫作為之基準。" },
     { no: 57, q: "何謂主計人員？", a: "辦理單位主辦主計（會計）人員及所屬承辦主計事務人員。" },
@@ -520,10 +520,10 @@ const RAW_QUESTIONS = [
     { no: 80, q: "試述國軍部隊至副供站採買有何限制，另駐地偏遠單位如何處置？", a: "（1）凡距副供站車程（單程）在30分鐘內之單位均應依規定向國軍副供站集中採購。（2）駐地偏遠之單位，得由上級單位視狀況研採併車分送或隔日採購方式行之。" },
     { no: 81, q: "收款之收付保管原則為何？", a: "均應依「統收統支」原則由國防部主計局財務中心所屬地區財務單位統一辦理，其餘各單位不得自為現金收支，或截留坐支。" },
     { no: 82, q: "依國軍官兵止伙作業規定，試述止伙費申領事由為何？", a: "（1）公假、公差。（限同一事由未申請雜費者，始得申請）。（2）慰勞假、榮譽假。（3）婚假。（4）產（檢）假及陪產（檢）假。（5）流產假。（6）喪假。（7）事假、病假及生理假。（8）調職。（9）軍事院校接受基礎、進修、深造教育期間假期之寒暑假、結訓假及新兵結訓假。（10）支援、因公受訓、職訓、講習及傷病住院。" },
-    { no: 83, q: "試述炊具費每人每月限額及範圍？", a: "（1）每人每月由副食費提列20元額度為限。（2）專供廚房、餐廳、購置消耗（零星）性用品及補充清潔用品、引火材料等支用，每月如有結餘時，應轉回副食費運用，不得移作他用。" },
+    { no: 83, q: "試述炊具費每人每月限額及範圍？", a: "（1）每人每月由副食費提列20元額度為限。（2）專供廚房, 餐廳、購置消耗（零星）性用品及補充清潔用品、引火材料等支用，每月如有結餘時，應轉回副食費運用，不得移作他用。" },
     { no: 84, q: "基層單位主官及預財士辦理移交時，監交人分別為何？", a: "（1）各基層單位主官，其監交人員為上級單位主官及主計單位主管（或其代表）。（2）各基層單位預財士，其監交人員為單位主官及主計單位主管（或其代表）。" },
     { no: 85, q: "簡述內部審核之區分為何？", a: "（1）事前審核：謂事項入帳前之審核，著重收支之控制。（2）事後複核：謂事項入帳後之審核，著重憑證、帳表之複核與工作績效之查核。" },
-    { no: 86, q: "依會計法第9級，政府會計之組織為那五種？", a: "總會計、單位會計、分會計、附屬單位會計、附屬單位會計之分會計。" },
+    { no: 86, q: "依會計法第9條，政府會計之組織為那五種？", a: "總會計、單位會計、分會計、附屬單位會計、附屬單位會計之分會計。" },
     { no: 87, q: "施政計畫之特性為何？", a: "前瞻性、整體性、持續性。" },
     { no: 88, q: "所屬各級單位主官及副主官行政費，上校及中校主官、副主官每月列支額度為何？", a: "（1）上校：6,600元。（2）中校：5,100元。" },
     { no: 89, q: "依各級單位對經管財務行政事項人員實施內部控制之自我檢查作業要點，其範圍為何？", a: "（1）預算執行。（2）會計處理。（3）現金收支。（4）財產保管。（5）採購及處分財物。（6）領回轉發案件（含營外欠款情形）。（7）補助費跨機關通報案件。（8）主計部門財務輔檢督導情形。（9）臨時交辦及其他重要事項。" },
@@ -918,7 +918,7 @@ function showQuestion() {
 function normalizeStr(str) {
     return (str || '')
         .replace(/[\uff01-\uff5e]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0xfee0))
-        .replace(/[\s\(\)\[\]（）〔〕【】、，。；：\.,:;""''「」『』\-_—~～]/g, '')
+        .replace(/[\s\(\)\[\]（）〔〕【】、.,:;""''「」『』\-_—~～]/g, '')
         .toLowerCase();
 }
 
@@ -1047,7 +1047,7 @@ function restartQuiz() {
     handleModeChange();
 }
 
-// 🎴 智慧字卡背誦系統
+// 🎴 智慧字卡背誦系統（強效 SRS 間距重複演算法）
 function openFlashcardSetup() {
     document.getElementById('view-setup').classList.add('hidden');
     document.getElementById('view-quiz').classList.add('hidden');
@@ -1074,28 +1074,27 @@ function changeCardScope(scope) {
     }
 
     cardList = pool.sort((a, b) => a.no - b.no);
-    const savedIdx = cardLastPositions[scope];
-    cardIndex = (typeof savedIdx === 'number' && savedIdx < cardList.length) ? savedIdx : 0;
+    cardIndex = 0;
     
     renderCardContent();
 }
 
 function restartFlashcards() {
     cardIndex = 0;
-    cardLastPositions[currentCardScope] = 0;
-    localStorage.setItem('card_last_positions_v2', JSON.stringify(cardLastPositions));
     renderCardContent();
 }
 
 function renderCardContent() {
     if (cardList.length === 0) return;
+    
+    // 如果不小心超過範圍，循環或卡在最後一題
+    if (cardIndex >= cardList.length) cardIndex = cardList.length - 1;
+    if (cardIndex < 0) cardIndex = 0;
+
     const item = cardList[cardIndex];
     
-    // 💡 強制重置翻轉狀態為正面
+    // 強制重置翻轉狀態為正面
     isCardFlipped = false;
-    
-    cardLastPositions[currentCardScope] = cardIndex;
-    localStorage.setItem('card_last_positions_v2', JSON.stringify(cardLastPositions));
 
     const card = document.getElementById('flashcard-card');
     const inner = document.getElementById('flashcard-inner');
@@ -1105,7 +1104,7 @@ function renderCardContent() {
     inner.classList.remove('is-flipped');
     document.getElementById('srs-box').classList.add('hidden');
 
-    document.getElementById('card-progress').textContent = `📝 題目 (${cardIndex + 1}/${cardList.length}) (#${item.no})`;
+    document.getElementById('card-progress').textContent = `📝 待複習佇列 (${cardIndex + 1}/${cardList.length}) (#${item.no})`;
 
     if (isReverseMode) {
         currentFrontText = item.a;
@@ -1141,16 +1140,40 @@ function flipCard() {
     }
 }
 
+// 🧠 智慧 SRS 間距重複核心演算法
 function rateCard(level) {
-    const item = cardList[cardIndex];
+    const currentItem = cardList[cardIndex];
+
     if (level === 'hard') {
-        wrongStats[item.no] = (wrongStats[item.no] || 0) + 1;
-        masteredSet.delete(item.no);
+        // 🔴 不會：取消熟記，並將該題高優先權塞回佇列前方（約 2~3 題後再次出現）
+        wrongStats[currentItem.no] = (wrongStats[currentItem.no] || 0) + 1;
+        masteredSet.delete(currentItem.no);
+        
+        // 插入到目前索引後方 2 個位置（若長度不夠則放最後）
+        cardList.splice(cardIndex, 1);
+        const reinsertPos = Math.min(cardList.length, cardIndex + 2);
+        cardList.splice(reinsertPos, 0, currentItem);
+
+    } else if (level === 'mid') {
+        // 🟡 模糊：維持或適度複習，將其往後推 4~5 題再練
+        cardList.splice(cardIndex, 1);
+        const reinsertPos = Math.min(cardList.length, cardIndex + 4);
+        cardList.splice(reinsertPos, 0, currentItem);
+
     } else if (level === 'easy') {
-        masteredSet.add(item.no);
+        // 🟢 輕鬆：標記為已熟記，並直接從本次短效複習佇列中移除或順利往下
+        masteredSet.add(currentItem.no);
+        cardIndex++;
     }
+
     saveAllData();
-    nextCard();
+
+    if (cardIndex >= cardList.length) {
+        alert("🎉 太棒了！您已成功消化本輪所有 SRS 間距重複字卡！");
+        exitFlashcards();
+    } else {
+        animateSlideTo('left', cardIndex);
+    }
 }
 
 function animateSlideTo(direction, targetIndex) {
@@ -1163,7 +1186,6 @@ function animateSlideTo(direction, targetIndex) {
 
     setTimeout(() => {
         cardIndex = targetIndex;
-        // 💡 換頁時呼叫 renderCardContent，確保新卡片回到正面
         renderCardContent();
 
         const flyInStartX = (direction === 'left') ? window.innerWidth * 1.2 : -window.innerWidth * 1.2;
