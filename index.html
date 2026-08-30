@@ -652,10 +652,10 @@ let cardLastPositions = {};
 let streakData = { days: 0, lastDate: "" };
 
 try {
-    masteredSet = new Set(JSON.parse(localStorage.getItem('mastered_questions_nco_general') || '[]'));
-    wrongStats = JSON.parse(localStorage.getItem('wrong_stats_nco_general') || '{}');
-    cardLastPositions = JSON.parse(localStorage.getItem('card_last_positions_nco_general') || '{}');
-    streakData = JSON.parse(localStorage.getItem('study_streak_data_nco') || '{"days":0, "lastDate":""}');
+    masteredSet = new Set(JSON.parse(localStorage.getItem('mastered_questions_stage2') || '[]'));
+    wrongStats = JSON.parse(localStorage.getItem('wrong_stats_stage2') || '{}');
+    cardLastPositions = JSON.parse(localStorage.getItem('card_last_positions_stage2') || '{}');
+    streakData = JSON.parse(localStorage.getItem('study_streak_data_stage2') || '{"days":0, "lastDate":""}');
 } catch (e) {
     localStorage.clear();
 }
@@ -681,7 +681,7 @@ function updateStudyStreak() {
         }
     }
     try {
-        localStorage.setItem('study_streak_data_nco', JSON.stringify(streakData));
+        localStorage.setItem('study_streak_data_stage2', JSON.stringify(streakData));
     } catch (e) {}
 }
 
@@ -708,9 +708,9 @@ let suppressClickUntil = 0;
 
 function saveAllData() {
     try {
-        localStorage.setItem('mastered_questions_nco_general', JSON.stringify([...masteredSet]));
-        localStorage.setItem('wrong_stats_nco_general', JSON.stringify(wrongStats));
-        localStorage.setItem('card_last_positions_nco_general', JSON.stringify(cardLastPositions));
+        localStorage.setItem('mastered_questions_stage2', JSON.stringify([...masteredSet]));
+        localStorage.setItem('wrong_stats_stage2', JSON.stringify(wrongStats));
+        localStorage.setItem('card_last_positions_stage2', JSON.stringify(cardLastPositions));
         renderDashboard();
     } catch (e) {}
 }
@@ -742,10 +742,10 @@ function renderDashboard() {
 
 function toggleDarkMode() {
     document.body.classList.toggle('dark-mode');
-    localStorage.setItem('dark_mode_enabled_nco', document.body.classList.contains('dark-mode'));
+    localStorage.setItem('dark_mode_enabled_stage2', document.body.classList.contains('dark-mode'));
 }
 
-if (localStorage.getItem('dark_mode_enabled_nco') === 'true') {
+if (localStorage.getItem('dark_mode_enabled_stage2') === 'true') {
     document.body.classList.add('dark-mode');
 }
 
@@ -849,17 +849,17 @@ function startQuiz() {
 
 function saveQuizSession() {
     if (!isQuizActive) {
-        localStorage.removeItem('quiz_session_nco_general');
+        localStorage.removeItem('quiz_session_stage2');
         renderPauseBanner();
         return;
     }
     const session = { quizList, userAnswers, currentIndex, activeMatchRule };
-    localStorage.setItem('quiz_session_nco_general', JSON.stringify(session));
+    localStorage.setItem('quiz_session_stage2', JSON.stringify(session));
     renderPauseBanner();
 }
 
 function renderPauseBanner() {
-    const raw = localStorage.getItem('quiz_session_nco_general');
+    const raw = localStorage.getItem('quiz_session_stage2');
     const banner = document.getElementById('panel-paused-quiz');
     if (!banner) return;
     if (raw) {
@@ -876,7 +876,7 @@ function renderPauseBanner() {
 }
 
 function resumeQuiz() {
-    const raw = localStorage.getItem('quiz_session_nco_general');
+    const raw = localStorage.getItem('quiz_session_stage2');
     if (!raw) return;
     try {
         const session = JSON.parse(raw);
@@ -894,7 +894,7 @@ function resumeQuiz() {
 
         showQuestion();
     } catch(e) {
-        localStorage.removeItem('quiz_session_nco_general');
+        localStorage.removeItem('quiz_session_stage2');
         renderPauseBanner();
     }
 }
@@ -902,7 +902,7 @@ function resumeQuiz() {
 function discardQuiz() {
     if (confirm("確定要放棄目前的測驗進度嗎？")) {
         isQuizActive = false;
-        localStorage.removeItem('quiz_session_nco_general');
+        localStorage.removeItem('quiz_session_stage2');
         renderPauseBanner();
     }
 }
@@ -1021,7 +1021,7 @@ function nextQuestion() {
 
 function showResult() {
     isQuizActive = false;
-    localStorage.removeItem('quiz_session_nco_general');
+    localStorage.removeItem('quiz_session_stage2');
     renderPauseBanner();
 
     document.getElementById('view-quiz').classList.add('hidden');
@@ -1090,7 +1090,7 @@ function changeCardScope(scope) {
 function restartFlashcards() {
     cardIndex = 0;
     cardLastPositions[currentCardScope] = 0;
-    localStorage.setItem('card_last_positions_nco_general', JSON.stringify(cardLastPositions));
+    localStorage.setItem('card_last_positions_stage2', JSON.stringify(cardLastPositions));
     renderCardContent();
 }
 
@@ -1100,7 +1100,7 @@ function renderCardContent() {
     isCardFlipped = false;
     
     cardLastPositions[currentCardScope] = cardIndex;
-    localStorage.setItem('card_last_positions_nco_general', JSON.stringify(cardLastPositions));
+    localStorage.setItem('card_last_positions_stage2', JSON.stringify(cardLastPositions));
 
     const card = document.getElementById('flashcard-card');
     const inner = document.getElementById('flashcard-inner');
@@ -1150,7 +1150,7 @@ function renderCardContentWithoutReset() {
     isCardFlipped = false;
     
     cardLastPositions[currentCardScope] = cardIndex;
-    localStorage.setItem('card_last_positions_nco_general', JSON.stringify(cardLastPositions));
+    localStorage.setItem('card_last_positions_stage2', JSON.stringify(cardLastPositions));
 
     document.getElementById('srs-box').classList.add('hidden');
     document.getElementById('card-progress').textContent = `📝 題目 (${cardIndex + 1}/${cardList.length}) (#${item.id})`;
@@ -1471,7 +1471,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (confirm("確定要重設所有已熟記標記與錯題嗎？")) {
             masteredSet.clear();
             wrongStats = {};
-            localStorage.removeItem('quiz_session_nco_general');
+            localStorage.removeItem('quiz_session_stage2');
             saveAllData();
             renderDashboard();
             renderPauseBanner();
