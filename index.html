@@ -45,7 +45,6 @@
         }
         h1 { font-size: 1.35rem; color: var(--primary); margin-bottom: 1.25rem; text-align: center; font-weight: 800; letter-spacing: -0.5px; }
         
-        /* 📊 進度儀表板 */
         .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -271,7 +270,6 @@
         }
         .flashcard-hint { font-size: 0.78rem; color: var(--text-muted); text-align: center; user-select: none; }
         
-        /* 🧠 智慧挖空黑塊 */
         .cloze-blank {
             background-color: #1e293b;
             color: transparent;
@@ -292,7 +290,6 @@
             box-shadow: inset 0 0 0 1px #eab308;
         }
 
-        /* 🎛️ 人體工學底部操控懸浮列 */
         .ergonomic-bar {
             display: flex;
             align-items: center;
@@ -571,7 +568,6 @@
                 <option value="easy">🟢 僅「易」題 (36題)</option>
                 <option value="mid">🟡 僅「中」題 (36題)</option>
                 <option value="hard">🔴 僅「難」題 (18題)</option>
-                <option value="random30">🎲 隨機抽 30 題</option>
             </select>
             
             <div class="quiz-topbar-right">
@@ -717,7 +713,6 @@ const RAW_QUESTIONS = [
     {"id": 34, "diff": "easy", "q": "代收款收支計畫編製作業，當年度之收支計畫最遲應於何時經權責單位核定？", "a": "會計年度終了前。"},
     {"id": 35, "diff": "easy", "q": "國軍人員誤餐費報支條件？", "a": "應符合「執行臨時性公務」及「無法於伙食團用膳」等2項要求。"},
     {"id": 36, "diff": "easy", "q": "數個機關、計畫或科目共同分攤之支付款項，其支出憑證不能分割者，應檢附何種文件？", "a": "支出機關（科目）分攤表。"},
-
     {"id": 37, "diff": "mid", "q": "年度考績獎金發放對象為何？", "a": "（1）國軍志願役官兵考績年度內任職服勤滿6個月以上。（2）考績績等合於發給獎金規範。"},
     {"id": 38, "diff": "mid", "q": "歲入預算收入款項應繳金額，如不能一次繳清時，應如何辦理？", "a": "得由填製單位於收入憑單附記欄內填註應繳總額及原因後，先按實收金額送繳，爾後分次補繳時，不須檢附文件。"},
     {"id": 39, "diff": "mid", "q": "國防部所屬各級單位主官及副主官行政費，動支對象為何？", "a": "各級部隊、機關單位指揮官、副指揮官及中校以上主官、副主官等。"},
@@ -754,7 +749,6 @@ const RAW_QUESTIONS = [
     {"id": 70, "diff": "mid", "q": "試述部隊特別補助之支用規定？", "a": "單位主官為加強領導統御，發揮即時犒賞部屬之獎勵（含獎金、獎品）及購置慰問品等所需費用。"},
     {"id": 71, "diff": "mid", "q": "試述炊具費其之支用規定？", "a": "專供廚房、餐廳、消耗（零星）性用品補充及清潔用品、引火材料等費用，如有結餘，仍應用於副食。"},
     {"id": 72, "diff": "mid", "q": "常備兵役軍事訓練人員之退伍旅費支給標準為何？", "a": "退員戶籍地址距離單位所在地未達60公里者，報支200元，60公里以上者，報支600元。"},
-
     {"id": 73, "diff": "hard", "q": "依各級單位對經管財務行政人員實施內部控制之「自我檢查」作業範圍？", "a": "（1）預算執行。（2）會計處理。（3）現金收支。（4）財產保管。（5）採購及處分財物。（6）領回轉發案件（含營外欠款情形）。（7）補助費跨機關通報案件。（8）主計部門財務輔檢督導情形。（9）臨時交辦及其他重要事項。"},
     {"id": 74, "diff": "hard", "q": "試述國防部所屬各級單位主官及副主官特別費使用範圍？", "a": "（1）贈送婚喪喜慶之禮金、奠儀、禮品、花籃（圈）、喜幛、輓聯、中堂及匾額等支出。（2）對本單位及所屬單位人員以實物之獎（犒）賞、慰勞（問）及餐敘等支出。（3）對外部單位（即本單位及所屬單位以外之單位）、民間團體與有關人士等之招待、餽（捐）贈及慰問等支出。"},
     {"id": 75, "diff": "hard", "q": "依國防部所屬單位歲入預算及預算外庫款收退作業規定，各單位依法應解繳國庫之款項，其範圍包括？", "a": "（一）歲入預算：1.罰款及賠償收入。2.規費收入。3.財產收入。4.營業盈餘及事業收入。5.其他收入。（二）預算外庫款：1.剔除經費。2.以前年度減列經費。3.以前年度押金收回。4.其他以前年度經費賸餘。"},
@@ -788,13 +782,14 @@ let examTimerInterval = null;
 let examTimeRemaining = 45 * 60;
 let currentBankFilter = 'all';
 
-// 字卡變數
+// 字卡背誦專屬變數
 let cardList = [];
 let cardIndex = 0;
 let isCardFlipped = false;
 let isClozeActive = false;
 let autoPlayInterval = null;
 let isAnimating = false;
+let suppressClickUntil = 0;
 
 function saveAllData() {
     localStorage.setItem('mastered_questions_stage3', JSON.stringify([...masteredSet]));
@@ -1081,7 +1076,7 @@ function checkSmartMatch(userRaw, standardRaw) {
     if (!cleanU) return false;
     if (cleanU === cleanS) return true;
 
-    const standardItems = standardRaw.split(/(?:[（\(]?\s*\d+\s*[）\.\、\)]|\n+)/)
+    const standardItems = standardRaw.split(/(?:[（\(]?\s*\d+\s*[）\.\\、\)]|\n+)/)
                                      .map(item => cleanSmartText(item))
                                      .filter(item => item.length > 0);
     if (standardItems.length > 1) {
@@ -1292,7 +1287,7 @@ function restartQuiz() {
 }
 
 /* ========================================================
-   🎴 智慧字卡背誦系統（跟手拖曳 + 獨立題庫範圍切換）
+   🎴 智慧字卡背誦系統（嚴格照題號排序 + 物理拖曳 + 點擊翻面無雙翻）
    ======================================================== */
 function openFlashcardSetup() {
     document.getElementById('view-setup').classList.add('hidden');
@@ -1301,7 +1296,7 @@ function openFlashcardSetup() {
     document.getElementById('view-result').classList.add('hidden');
     document.getElementById('view-flashcard').classList.remove('hidden');
     
-    // 預設以未熟記題庫開始
+    // 預設以未熟記題庫開始，嚴格依照題號由小至大排序
     changeCardScope(document.getElementById('select-card-scope').value || 'unmastered');
 }
 
@@ -1312,7 +1307,7 @@ function changeCardScope(scope) {
     } else if (scope === 'unmastered') {
         pool = RAW_QUESTIONS.filter(q => !masteredSet.has(q.id));
         if (pool.length === 0) {
-            alert("🎉 所有題目均已標記熟記！已為您自動切換至「全部總題庫」。");
+            alert("🎉 所有題目均已標記熟記！已為您切換至「全部總題庫」。");
             document.getElementById('select-card-scope').value = 'all';
             pool = [...RAW_QUESTIONS];
         }
@@ -1329,11 +1324,10 @@ function changeCardScope(scope) {
         pool = RAW_QUESTIONS.filter(q => q.diff === 'mid');
     } else if (scope === 'hard') {
         pool = RAW_QUESTIONS.filter(q => q.diff === 'hard');
-    } else if (scope === 'random30') {
-        pool = getRandomSubarray(RAW_QUESTIONS, 30);
     }
 
-    cardList = pool.sort(() => 0.5 - Math.random());
+    // 💡 關鍵：字卡模式嚴格按照題號 (id) 升冪排序排列！
+    cardList = pool.sort((a, b) => a.id - b.id);
     cardIndex = 0;
     isCardFlipped = false;
     isAnimating = false;
@@ -1377,7 +1371,7 @@ function renderCardContent() {
     inner.classList.remove('is-flipped');
     document.getElementById('btn-toggle-reveal').textContent = "全部揭曉";
 
-    document.getElementById('card-progress').textContent = `📝 題目 (${cardIndex + 1}/${cardList.length})`;
+    document.getElementById('card-progress').textContent = `📝 題目 (${cardIndex + 1}/${cardList.length}) (#${item.id})`;
     document.getElementById('card-q-text').textContent = item.q;
     
     if (isClozeActive) {
@@ -1395,12 +1389,20 @@ function renderCardContent() {
     document.getElementById('btn-card-prev').disabled = (cardIndex === 0);
 }
 
+// 💡 乾淨翻面邏輯（徹底解決翻兩下問題）
 function flipCard() {
     if (isAnimating) return;
+    const now = Date.now();
+    if (now < suppressClickUntil) return;
+    suppressClickUntil = now + 250; // 防抖 250ms
+
     isCardFlipped = !isCardFlipped;
     const inner = document.getElementById('flashcard-inner');
-    if (isCardFlipped) inner.classList.add('is-flipped');
-    else inner.classList.remove('is-flipped');
+    if (isCardFlipped) {
+        inner.classList.add('is-flipped');
+    } else {
+        inner.classList.remove('is-flipped');
+    }
 }
 
 function toggleAllBlanks() {
@@ -1419,7 +1421,7 @@ function animateSlideTo(direction, onComplete) {
     isAnimating = true;
     const card = document.getElementById('flashcard-card');
     const destX = (direction === 'left') ? -window.innerWidth * 1.1 : window.innerWidth * 1.1;
-    const rotate = (direction === 'left') ? -20 : 20;
+    const rotate = (direction === 'left') ? -18 : 18;
 
     card.style.transition = 'transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.25s ease';
     card.style.transform = `translate(${destX}px, 20px) rotate(${rotate}deg)`;
@@ -1430,7 +1432,7 @@ function animateSlideTo(direction, onComplete) {
         // 從另一側滑入
         const startX = (direction === 'left') ? window.innerWidth * 0.9 : -window.innerWidth * 0.9;
         card.style.transition = 'none';
-        card.style.transform = `translate(${startX}px, 0px) rotate(${(direction === 'left') ? 10 : -10}deg)`;
+        card.style.transform = `translate(${startX}px, 0px) rotate(${(direction === 'left') ? 8 : -8}deg)`;
         card.style.opacity = '0';
 
         requestAnimationFrame(() => {
@@ -1518,25 +1520,25 @@ function speakText(text) {
 }
 
 /* ========================================================
-   👆 真實物理跟手拖曳滑動 (Real-time Physics Drag & Swipe)
+   👆 真實物理跟手拖曳滑動（Tinder/Anki 跟手動態）
    ======================================================== */
-const card = document.getElementById('flashcard-card');
+const cardEl = document.getElementById('flashcard-card');
 let isDragging = false;
 let startX = 0;
 let startY = 0;
 let currentX = 0;
 let currentY = 0;
-let hasMoved = false;
+let isMovedSignificantly = false;
 
 function onDragStart(clientX, clientY) {
     if (isAnimating) return;
     isDragging = true;
-    hasMoved = false;
+    isMovedSignificantly = false;
     startX = clientX;
     startY = clientY;
     currentX = clientX;
     currentY = clientY;
-    card.style.transition = 'none';
+    cardEl.style.transition = 'none';
 }
 
 function onDragMove(clientX, clientY) {
@@ -1546,14 +1548,14 @@ function onDragMove(clientX, clientY) {
     const deltaX = currentX - startX;
     const deltaY = currentY - startY;
 
-    if (Math.abs(deltaX) > 8 || Math.abs(deltaY) > 8) {
-        hasMoved = true;
+    if (Math.abs(deltaX) > 10 || Math.abs(deltaY) > 10) {
+        isMovedSignificantly = true;
     }
 
-    // 跟手動態旋轉與位移
-    const rotation = deltaX * 0.06;
-    card.style.transform = `translate(${deltaX}px, ${deltaY * 0.25}px) rotate(${rotation}deg)`;
-    card.style.opacity = Math.max(0.4, 1 - Math.abs(deltaX) / (window.innerWidth * 0.95));
+    // 卡片跟隨手指移動與微旋轉
+    const rotation = deltaX * 0.05;
+    cardEl.style.transform = `translate(${deltaX}px, ${deltaY * 0.25}px) rotate(${rotation}deg)`;
+    cardEl.style.opacity = Math.max(0.4, 1 - Math.abs(deltaX) / (window.innerWidth * 0.9));
 }
 
 function onDragEnd() {
@@ -1562,8 +1564,9 @@ function onDragEnd() {
     const deltaX = currentX - startX;
     const deltaY = currentY - startY;
 
-    // 拖曳位移超過 75px 視為滑脫成功
-    if (Math.abs(deltaX) > 75 && Math.abs(deltaX) > Math.abs(deltaY) * 1.1) {
+    // 若水平滑動距離大於 80px，觸發滑動換題
+    if (Math.abs(deltaX) > 80 && Math.abs(deltaX) > Math.abs(deltaY) * 1.15) {
+        suppressClickUntil = Date.now() + 350; // 防止滑動結束觸發點擊翻面
         if (deltaX < 0) {
             // 左滑 -> 下一張
             if (cardIndex < cardList.length - 1) {
@@ -1581,40 +1584,40 @@ function onDragEnd() {
             }
         }
     } else {
-        if (!hasMoved) {
-            // 沒有滑動，單純點擊 -> 翻面
+        if (!isMovedSignificantly) {
+            // 沒有滑動 -> 單純點擊翻面
             flipCard();
         } else {
-            // 滑動距離不足 -> 絲滑回彈原位
+            // 滑動距離不夠 -> 彈性回彈原位
             springBack();
         }
     }
 }
 
 function springBack() {
-    card.style.transition = 'transform 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.25), opacity 0.25s ease';
-    card.style.transform = 'translate(0px, 0px) rotate(0deg)';
-    card.style.opacity = '1';
+    cardEl.style.transition = 'transform 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.25), opacity 0.25s ease';
+    cardEl.style.transform = 'translate(0px, 0px) rotate(0deg)';
+    cardEl.style.opacity = '1';
 }
 
-// 手機觸控事件綁定
-card.addEventListener('touchstart', (e) => {
+// 觸控事件
+cardEl.addEventListener('touchstart', (e) => {
     if (e.target.classList.contains('cloze-blank') || e.target.closest('button')) return;
     onDragStart(e.touches[0].clientX, e.touches[0].clientY);
 }, { passive: true });
 
-card.addEventListener('touchmove', (e) => {
+cardEl.addEventListener('touchmove', (e) => {
     if (!isDragging) return;
     onDragMove(e.touches[0].clientX, e.touches[0].clientY);
 }, { passive: true });
 
-card.addEventListener('touchend', (e) => {
+cardEl.addEventListener('touchend', (e) => {
     if (!isDragging) return;
     onDragEnd();
 });
 
-// 電腦滑鼠拖曳事件綁定
-card.addEventListener('mousedown', (e) => {
+// 滑鼠拖曳事件（電腦版支援）
+cardEl.addEventListener('mousedown', (e) => {
     if (e.target.classList.contains('cloze-blank') || e.target.closest('button')) return;
     onDragStart(e.clientX, e.clientY);
 });
