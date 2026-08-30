@@ -14,7 +14,7 @@
             --warning: #d97706;
             --purple: #6366f1;
             --purple-hover: #4f46e5;
-            --bg: #f1f5f9;
+            --bg: #f8fafc;
             --card-bg: #ffffff;
             --text: #0f172a;
             --text-muted: #64748b;
@@ -146,7 +146,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
+            margin-bottom: 0.85rem;
             flex-wrap: wrap;
             gap: 0.5rem;
         }
@@ -190,20 +190,14 @@
         .stat-rate { font-size: 2.5rem; font-weight: 800; color: var(--primary); margin: 0.4rem 0; }
         
         /* ========================================================
-           🎴 絲滑 3D 字卡與手勢動畫
+           🎴 真實物理跟手拖曳 3D 字卡
            ======================================================== */
-        .card-carousel-wrapper {
+        .card-stage {
             position: relative;
             width: 100%;
             height: 350px;
-            margin: 0.5rem 0 1.25rem 0;
-            overflow: visible;
-        }
-        .flashcard-scene {
-            width: 100%;
-            height: 100%;
+            margin: 0.5rem 0 1.15rem 0;
             perspective: 1200px;
-            cursor: pointer;
             touch-action: pan-y;
         }
         .flashcard {
@@ -211,41 +205,22 @@
             height: 100%;
             position: relative;
             transform-style: preserve-3d;
-            transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
             border-radius: 16px;
             box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+            cursor: grab;
             will-change: transform, opacity;
         }
-        .flashcard.is-flipped { transform: rotateY(180deg); }
+        .flashcard:active { cursor: grabbing; }
         
-        /* 滑動動畫 Classes */
-        .flashcard.slide-out-left {
-            animation: slideOutLeft 0.28s forwards ease-in;
+        .flashcard-inner {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border-radius: 16px;
         }
-        .flashcard.slide-out-right {
-            animation: slideOutRight 0.28s forwards ease-in;
-        }
-        .flashcard.slide-in-right {
-            animation: slideInRight 0.28s forwards cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
-        .flashcard.slide-in-left {
-            animation: slideInLeft 0.28s forwards cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
-        
-        @keyframes slideOutLeft {
-            to { transform: translateX(-120%) rotate(-12deg); opacity: 0; }
-        }
-        @keyframes slideOutRight {
-            to { transform: translateX(120%) rotate(12deg); opacity: 0; }
-        }
-        @keyframes slideInRight {
-            from { transform: translateX(100%) rotate(8deg); opacity: 0; }
-            to { transform: translateX(0) rotate(0); opacity: 1; }
-        }
-        @keyframes slideInLeft {
-            from { transform: translateX(-100%) rotate(-8deg); opacity: 0; }
-            to { transform: translateX(0) rotate(0); opacity: 1; }
-        }
+        .flashcard-inner.is-flipped { transform: rotateY(180deg); }
 
         .flashcard-face {
             position: absolute;
@@ -317,17 +292,17 @@
             box-shadow: inset 0 0 0 1px #eab308;
         }
 
-        /* 🎛️ 人體工學底部操控懸浮吧 */
+        /* 🎛️ 人體工學底部操控懸浮列 */
         .ergonomic-bar {
             display: flex;
             align-items: center;
             justify-content: space-between;
             background: #ffffff;
-            border: 1px solid var(--border);
-            padding: 0.5rem 0.6rem;
+            border: 1.5px solid var(--border);
+            padding: 0.45rem 0.6rem;
             border-radius: 40px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.04);
-            margin-top: 0.5rem;
+            margin-top: 0.35rem;
         }
         .ergo-btn-circle {
             width: 46px;
@@ -339,12 +314,11 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 1.15rem;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.15s;
             flex-shrink: 0;
         }
-        .ergo-btn-circle:active { transform: scale(0.92); }
+        .ergo-btn-circle:active { transform: scale(0.9); }
         .ergo-btn-circle:hover { background: #e2e8f0; color: #0f172a; }
         .ergo-btn-circle:disabled { background: #f8fafc; color: #cbd5e1; cursor: not-allowed; }
         
@@ -364,13 +338,13 @@
             gap: 0.35rem;
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
-            transition: all 0.2s;
+            transition: all 0.15s;
         }
         .ergo-btn-center:active { transform: scale(0.96); }
         
         .ergo-btn-autoplay {
             height: 46px;
-            padding: 0 1rem;
+            padding: 0 0.9rem;
             border-radius: 25px;
             border: 1.5px solid var(--border);
             background: #fff;
@@ -381,7 +355,7 @@
             align-items: center;
             gap: 0.3rem;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.15s;
             flex-shrink: 0;
         }
         .ergo-btn-autoplay.active {
@@ -421,7 +395,6 @@
         }
         .hidden { display: none !important; }
         
-        /* 🖨️ 列印樣式優化 */
         @media print {
             body { background: #fff; color: #000; padding: 0; }
             .container { box-shadow: none; max-width: 100%; border: none; padding: 0; }
@@ -473,7 +446,7 @@
         </div>
 
         <div class="setup-group">
-            <label for="select-mode">題目範圍與模式：</label>
+            <label for="select-mode">題目範圍與抽題模式：</label>
             <select id="select-mode" onchange="handleModeChange()">
                 <option value="ratio" selected>依難易度配題（預設 15/10/5，含熟記題）</option>
                 <option value="weakness">🔥 弱點專攻模式（優先抽歷史常錯與未熟記題）</option>
@@ -529,7 +502,7 @@
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 1.25rem;">
             <button class="btn" onclick="startNewQuizClick()">✍️ 開始打字測驗</button>
-            <button class="btn btn-purple" onclick="startFlashcards()">🎴 進入字卡背誦</button>
+            <button class="btn btn-purple" onclick="openFlashcardSetup()">🎴 進入字卡背誦</button>
         </div>
 
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; font-size: 0.85rem;">
@@ -587,14 +560,24 @@
         <div id="quiz-feedback" class="feedback hidden"></div>
     </div>
 
-    <!-- 🎴 智慧字卡背誦畫面（絲滑動畫 + 人體工學懸浮操控） -->
+    <!-- 🎴 智慧字卡背誦畫面（跟手拖曳滑動 + 獨立範圍選擇） -->
     <div id="view-flashcard" class="hidden">
         <div class="quiz-topbar">
-            <div class="status-badge" id="card-progress" style="background:#ede9fe; color:#6d28d9;">字卡：1 / 30</div>
+            <!-- 🎴 字卡專屬題庫範圍下拉選單 -->
+            <select id="select-card-scope" onchange="changeCardScope(this.value)" style="width:auto; padding:0.3rem 0.6rem; font-size:0.85rem; font-weight:700; border-radius:20px; border-color:#c7d2fe; background:#ede9fe; color:#4338ca;">
+                <option value="unmastered" selected>📚 僅未熟記題庫</option>
+                <option value="all">🌐 全部總題庫 (90題)</option>
+                <option value="wrong">🔥 常錯題庫</option>
+                <option value="easy">🟢 僅「易」題 (36題)</option>
+                <option value="mid">🟡 僅「中」題 (36題)</option>
+                <option value="hard">🔴 僅「難」題 (18題)</option>
+                <option value="random30">🎲 隨機抽 30 題</option>
+            </select>
+            
             <div class="quiz-topbar-right">
                 <label class="mastered-toggle" title="智慧挖空核心關鍵詞">
                     <input type="checkbox" id="chk-cloze" onchange="toggleClozeMode(this.checked)">
-                    <span>🧠 智慧挖空</span>
+                    <span>🧠 挖空</span>
                 </label>
                 <label class="mastered-toggle">
                     <input type="checkbox" id="chk-card-mastered" onchange="toggleCardMastered(this.checked)">
@@ -604,33 +587,33 @@
             </div>
         </div>
 
-        <!-- 3D 卡片旋轉與動畫容器 -->
-        <div class="card-carousel-wrapper">
-            <div class="flashcard-scene" id="flashcard-touch-zone" onclick="handleCardClick(event)">
-                <div class="flashcard" id="flashcard-card">
+        <!-- 3D 物理拖曳旋轉舞台 -->
+        <div class="card-stage" id="card-stage">
+            <div class="flashcard" id="flashcard-card">
+                <div class="flashcard-inner" id="flashcard-inner">
                     <!-- 正面 -->
                     <div class="flashcard-face flashcard-front">
                         <div class="flashcard-side-label">
-                            <span>📝 題目 (正面)</span>
+                            <span id="card-progress">📝 題目 (1/90)</span>
                             <div style="display:flex; gap:0.4rem; align-items:center;">
                                 <button class="btn-text-sm" onclick="event.stopPropagation(); speakText(cardList[cardIndex].q);" title="語音朗讀">🔊 朗讀</button>
                                 <span id="card-diff-tag" class="diff-tag diff-tag-easy">易</span>
                             </div>
                         </div>
                         <div class="flashcard-body" id="card-q-text"></div>
-                        <div class="flashcard-hint">👆 點擊卡片翻面 ｜ 👈 左右滑動切換題目 👉</div>
+                        <div class="flashcard-hint">👆 點擊翻面 ｜ 👈 水平滑動切換 👉</div>
                     </div>
                     <!-- 背面 -->
                     <div class="flashcard-face flashcard-back">
                         <div class="flashcard-side-label">
-                            <span>💡 標準答案 (背面)</span>
+                            <span>💡 標準答案</span>
                             <div style="display:flex; gap:0.5rem; align-items:center;">
                                 <button class="btn-text-sm" id="btn-toggle-reveal" onclick="event.stopPropagation(); toggleAllBlanks();" style="color:#0284c7;">全部揭曉</button>
                                 <button class="btn-text-sm" onclick="event.stopPropagation(); speakText(cardList[cardIndex].a);" style="color:#166534;" title="語音朗讀">🔊 朗讀</button>
                             </div>
                         </div>
                         <div class="flashcard-body" id="card-a-text" style="font-weight:500;"></div>
-                        <div class="flashcard-hint">👆 點擊卡片翻回正面 ｜ 👈 左右滑動切換題目 👉</div>
+                        <div class="flashcard-hint">👆 點擊翻回正面 ｜ 👈 水平滑動切換 👉</div>
                     </div>
                 </div>
             </div>
@@ -698,101 +681,98 @@
 
 <script>
 const RAW_QUESTIONS = [
-    // 🟢 易 (36題, id: 1~36)
-    { id: 1, diff: "easy", q: "為確保國軍基本防衛武力與發展所需軟、硬體設（施）備之各項費用係指何預算？", a: "軍事投資。" },
-    { id: 2, diff: "easy", q: "政府採購法所律定之「公告金額」額度為多少？", a: "150萬元。" },
-    { id: 3, diff: "easy", q: "支票印鑑應於何時加蓋？", a: "實際交付支票時。" },
-    { id: 4, diff: "easy", q: "國防部所屬各級單位主官及副主官行政費，上校及中校主官、副主官每月列支額度為何？", a: "（1）上校：6,600元。（2）中校：5,100元。" },
-    { id: 5, diff: "easy", q: "依國軍各級單位現金會計作業規定第30條，有關業務部門簽借墊借款應預定歸還期限，無論預算是否獲得，應於取得單據或任務結束後多少日內辦理核銷歸墊？", a: "30日內。" },
-    { id: 6, diff: "easy", q: "依軍費預算執行及支付結報規定第5項，預算分配區分哪二種？", a: "（1）計畫分配。（2）管制分配。" },
-    { id: 7, diff: "easy", q: "依國軍各單位預算簿籍憑證保管期限參照表，本島各機關學校憑證自總決算公布日起，保存幾年？", a: "2年。" },
-    { id: 8, diff: "easy", q: "依國軍各級單位現金會計作業第34條，單位伙食團申借副食週轉金時應記入何項會計科目？", a: "借入款。" },
-    { id: 9, diff: "easy", q: "單位弟兄之父親過世，其支付奠儀款項宜由何科目列支？", a: "主官行政費。" },
-    { id: 10, diff: "easy", q: "依國軍勞軍款處理作業規定，收支計畫應於收款幾日內完成計畫編製？", a: "10個工作日。" },
-    { id: 11, diff: "easy", q: "依國防部所屬單位會計檔案存管作業規定，各單位主官（職務代理人）對會計資料檔案與安全設備每月至少應檢查幾次？", a: "一次。" },
-    { id: 12, diff: "easy", q: "支票何處填寫錯誤不得塗改？", a: "金額大小寫。" },
-    { id: 13, diff: "easy", q: "本島一般部隊每月副食外購比例為副食費收入總額百分之幾？", a: "20%。" },
-    { id: 14, diff: "easy", q: "依會計法第53條，記帳憑證有那3種？", a: "收入傳票、支出傳票及轉帳傳票。" },
-    { id: 15, diff: "easy", q: "何謂主計人員？", a: "辦理單位主辦主計（會計）人員及所屬承辦主計事務人員謂之。" },
-    { id: 16, diff: "easy", q: "政府統計之調查、編製，全國統計總報告之編纂，統計辦法之統一，工作之分配，及業務之指導、監督，依何法規辦理？", a: "統計法。" },
-    { id: 17, diff: "easy", q: "已屆滿保管期限之會計檔案，經何單位核准銷毀計畫及目錄後即可辦理水銷作業？", a: "審計部。" },
-    { id: 18, diff: "easy", q: "單位各類所得扣繳暨免扣繳資料，應於何時前彙整向當地稽徵機關申報？", a: "應於每年1月底前完成作業。" },
-    { id: 19, diff: "easy", q: "依會計法第51條，為證明事項經過而造具記帳憑證所根據之憑證稱為？", a: "原始憑證。" },
-    { id: 20, diff: "easy", q: "獨立於總預算外之預算個體為何？", a: "特別預算。" },
-    { id: 21, diff: "easy", q: "依官兵薪餉自由選擇薪資存款業務金融機構計有那4家？", a: "郵局、土地銀行、合作金庫銀行及台新銀行。" },
-    { id: 22, diff: "easy", q: "為強化單位現金管理應於多久時間統計使用情形簽請主官重新核定櫃存現金限額？", a: "每半年。" },
-    { id: 23, diff: "easy", q: "國軍人員（現役官士兵、軍中文職、聘雇人員）之薪俸、加給、主副食費、保險及撫卹等各項費用係指何預算？", a: "人員維持。" },
-    { id: 24, diff: "easy", q: "內部審核區分為？", a: "事前審核及事後複核。" },
-    { id: 25, diff: "easy", q: "維持國軍單位一般基本行政運作所需之各項費用係指何預算？", a: "作業維持。" },
-    { id: 26, diff: "easy", q: "依國軍各級單位額定零用金作業規定，國防經費零用金每筆支出上限，額度為多少？", a: "2萬。" },
-    { id: 27, diff: "easy", q: "依會計法第51條，何謂記帳憑證？述明之。", a: "謂證明處理會計事項人員之責任而為記帳所根據之憑證。" },
-    { id: 28, diff: "easy", q: "依國防部所屬各級單位辦理國庫機關專戶存款網路銀行業務應行注意事項，各單位運用網路銀行轉帳交易至少律定哪四層以上之作業控管機制，並簽奉單位主官核定？", a: "（1）編輯（出納）。（2）審核（會計）。（3）核定（主計主管）。（4）放行（主官）。" },
-    { id: 29, diff: "easy", q: "依政府採購法第18條，採購之招標方式有那幾種？", a: "（1）公開招標。（2）選擇性招標。（3）限制性招標。" },
-    { id: 30, diff: "easy", q: "試問國軍各級單位定額業務費給與調整要件？", a: "（1）主官（管）編階異動。（2）編制員額調整。（3）任務調整。" },
-    { id: 31, diff: "easy", q: "單位櫃存現金、支票、有價證券或貴重物品財產，應存置於不易移動之保險櫃，保險櫃應靠近出納人員，並以幾道以上上鎖機制管制？", a: "2道以上。" },
-    { id: 32, diff: "easy", q: "櫃存現金上限額度由何人律定？", a: "單位主官。" },
-    { id: 33, diff: "easy", q: "何謂歲出預算？", a: "稱歲出者，謂一個會計年度之一切支出。但不包括債務之償還。" },
-    { id: 34, diff: "easy", q: "代收款收支計畫編製作業，當年度之收支計畫最遲應於何時經權責單位核定？", a: "會計年度終了前。" },
-    { id: 35, diff: "easy", q: "國軍人員誤餐費報支條件？", a: "應符合「執行臨時性公務」及「無法於伙食團用膳」等2項要求。" },
-    { id: 36, diff: "easy", q: "數個機關、計畫或科目共同分攤之支付款項，其支出憑證不能分割者，應檢附何種文件？", a: "支出機關（科目）分攤表。" },
+    {"id": 1, "diff": "easy", "q": "為確保國軍基本防衛武力與發展所需軟、硬體設（施）備之各項費用係指何預算？", "a": "軍事投資。"},
+    {"id": 2, "diff": "easy", "q": "政府採購法所律定之「公告金額」額度為多少？", "a": "150萬元。"},
+    {"id": 3, "diff": "easy", "q": "支票印鑑應於何時加蓋？", "a": "實際交付支票時。"},
+    {"id": 4, "diff": "easy", "q": "國防部所屬各級單位主官及副主官行政費，上校及中校主官、副主官每月列支額度為何？", "a": "（1）上校：6,600元。（2）中校：5,100元。"},
+    {"id": 5, "diff": "easy", "q": "依國軍各級單位現金會計作業規定第30條，有關業務部門簽借墊借款應預定歸還期限，無論預算是否獲得，應於取得單據或任務結束後多少日內辦理核銷歸墊？", "a": "30日內。"},
+    {"id": 6, "diff": "easy", "q": "依軍費預算執行及支付結報規定第5項，預算分配區分哪二種？", "a": "（1）計畫分配。（2）管制分配。"},
+    {"id": 7, "diff": "easy", "q": "依國軍各單位預算簿籍憑證保管期限參照表，本島各機關學校憑證自總決算公布日起，保存幾年？", "a": "2年。"},
+    {"id": 8, "diff": "easy", "q": "依國軍各級單位現金會計作業第34條，單位伙食團申借副食週轉金時應記入何項會計科目？", "a": "借入款。"},
+    {"id": 9, "diff": "easy", "q": "單位弟兄之父親過世，其支付奠儀款項宜由何科目列支？", "a": "主官行政費。"},
+    {"id": 10, "diff": "easy", "q": "依國軍勞軍款處理作業規定，收支計畫應於收款幾日內完成計畫編製？", "a": "10個工作日。"},
+    {"id": 11, "diff": "easy", "q": "依國防部所屬單位會計檔案存管作業規定，各單位主官（職務代理人）對會計資料檔案與安全設備每月至少應檢查幾次？", "a": "一次。"},
+    {"id": 12, "diff": "easy", "q": "支票何處填寫錯誤不得塗改？", "a": "金額大小寫。"},
+    {"id": 13, "diff": "easy", "q": "本島一般部隊每月副食外購比例為副食費收入總額百分之幾？", "a": "20%。"},
+    {"id": 14, "diff": "easy", "q": "依會計法第53條，記帳憑證有那3種？", "a": "收入傳票、支出傳票及轉帳傳票。"},
+    {"id": 15, "diff": "easy", "q": "何謂主計人員？", "a": "辦理單位主辦主計（會計）人員及所屬承辦主計事務人員謂之。"},
+    {"id": 16, "diff": "easy", "q": "政府統計之調查、編製，全國統計總報告之編纂，統計辦法之統一，工作之分配，及業務之指導、監督，依何法規辦理？", "a": "統計法。"},
+    {"id": 17, "diff": "easy", "q": "已屆滿保管期限之會計檔案，經何單位核准銷毀計畫及目錄後即可辦理水銷作業？", "a": "審計部。"},
+    {"id": 18, "diff": "easy", "q": "單位各類所得扣繳暨免扣繳資料，應於何時前彙整向當地稽徵機關申報？", "a": "應於每年1月底前完成作業。"},
+    {"id": 19, "diff": "easy", "q": "依會計法第51條，為證明事項經過而造具記帳憑證所根據之憑證稱為？", "a": "原始憑證。"},
+    {"id": 20, "diff": "easy", "q": "獨立於總預算外之預算個體為何？", "a": "特別預算。"},
+    {"id": 21, "diff": "easy", "q": "依官兵薪餉自由選擇薪資存款業務金融機構計有那4家？", "a": "郵局、土地銀行、合作金庫銀行及台新銀行。"},
+    {"id": 22, "diff": "easy", "q": "為強化單位現金管理應於多久時間統計使用情形簽請主官重新核定櫃存現金限額？", "a": "每半年。"},
+    {"id": 23, "diff": "easy", "q": "國軍人員（現役官士兵、軍中文職、聘雇人員）之薪俸、加給、主副食費、保險及撫卹等各項費用係指何預算？", "a": "人員維持。"},
+    {"id": 24, "diff": "easy", "q": "內部審核區分為？", "a": "事前審核及事後複核。"},
+    {"id": 25, "diff": "easy", "q": "維持國軍單位一般基本行政運作所需之各項費用係指何預算？", "a": "作業維持。"},
+    {"id": 26, "diff": "easy", "q": "依國軍各級單位額定零用金作業規定，國防經費零用金每筆支出上限，額度為多少？", "a": "2萬。"},
+    {"id": 27, "diff": "easy", "q": "依會計法第51條，何謂記帳憑證？述明之。", "a": "謂證明處理會計事項人員之責任而為記帳所根據之憑證。"},
+    {"id": 28, "diff": "easy", "q": "依國防部所屬各級單位辦理國庫機關專戶存款網路銀行業務應行注意事項，各單位運用網路銀行轉帳交易至少律定哪四層以上之作業控管機制，並簽奉單位主官核定？", "a": "（1）編輯（出納）。（2）審核（會計）。（3）核定（主計主管）。（4）放行（主官）。"},
+    {"id": 29, "diff": "easy", "q": "依政府採購法第18條，採購之招標方式有那幾種？", "a": "（1）公開招標。（2）選擇性招標。（3）限制性招標。"},
+    {"id": 30, "diff": "easy", "q": "試問國軍各級單位定額業務費給與調整要件？", "a": "（1）主官（管）編階異動。（2）編制員額調整。（3）任務調整。"},
+    {"id": 31, "diff": "easy", "q": "單位櫃存現金、支票、有價證券或貴重物品財產，應存置於不易移動之保險櫃，保險櫃應靠近出納人員，並以幾道以上上鎖機制管制？", "a": "2道以上。"},
+    {"id": 32, "diff": "easy", "q": "櫃存現金上限額度由何人律定？", "a": "單位主官。"},
+    {"id": 33, "diff": "easy", "q": "何謂歲出預算？", "a": "稱歲出者，謂一個會計年度之一切支出。但不包括債務之償還。"},
+    {"id": 34, "diff": "easy", "q": "代收款收支計畫編製作業，當年度之收支計畫最遲應於何時經權責單位核定？", "a": "會計年度終了前。"},
+    {"id": 35, "diff": "easy", "q": "國軍人員誤餐費報支條件？", "a": "應符合「執行臨時性公務」及「無法於伙食團用膳」等2項要求。"},
+    {"id": 36, "diff": "easy", "q": "數個機關、計畫或科目共同分攤之支付款項，其支出憑證不能分割者，應檢附何種文件？", "a": "支出機關（科目）分攤表。"},
 
-    // 🟡 中 (36題, id: 37~72)
-    { id: 37, diff: "mid", q: "年度考績獎金發放對象為何？", a: "（1）國軍志願役官兵考績年度內任職服勤滿6個月以上。（2）考績績等合於發給獎金規範。" },
-    { id: 38, diff: "mid", q: "歲入預算收入款項應繳金額，如不能一次繳清時，應如何辦理？", a: "得由填製單位於收入憑單附記欄內填註應繳總額及原因後，先按實收金額送繳，爾後分次補繳時，不須檢附文件。" },
-    { id: 39, diff: "mid", q: "國防部所屬各級單位主官及副主官行政費，動支對象為何？", a: "各級部隊、機關單位指揮官、副指揮官及中校以上主官、副主官等。" },
-    { id: 40, diff: "mid", q: "依國軍各級單位現金會計作業規定，會計報告區分那些？", a: "（1）日報：現金結存日報表。（2）月報：平衡表、總分類帳各明細分類帳科目餘額明細表、現金餘額分析表。" },
-    { id: 41, diff: "mid", q: "何謂甲種財務代理人？", a: "財務單位在特殊情況下，得應預算支用單位之請求，臨時指派財務官於指定地點辦理費款支付事宜者。" },
-    { id: 42, diff: "mid", q: "依強化基層部隊財務管理內部控制具體作法，主計部門對預財組之檢查，除應依「群（營、連）級單位自我檢查督檢項目」逐項檢核外，應依業務特性實需，適時增訂檢查項目，驗證重點項目為何？", a: "（1）預財組人員職務異動業務移交清點。（2）印鑑設置及保管。（3）支票簽發及支票登記簿登載。（4）會計檔案存管。" },
-    { id: 43, diff: "mid", q: "試問會計日報表編報期限為何？", a: "以截至當日終了時之帳載資料編報之，並應於次一工作天12時前送達單位主官核閱。" },
-    { id: 44, diff: "mid", q: "依國軍各級單位現金會計作業規定，試問墊借款之定義為何？", a: "因業務需要先行墊借之款項或借予業務部門之業務週轉金均屬之。" },
-    { id: 45, diff: "mid", q: "團體獎金之運用範圍為何？試述之。", a: "應置重點於改善官兵福利及增進官兵權益，如個人獎金（品）、餐會、自強活動暨其他屬團體性之支出事項。" },
-    { id: 46, diff: "mid", q: "依據國軍各級單位現金會計作業規定，試問暫收款之定義為何？", a: "凡性質尚未確定之各項待查明、領回轉發、待解繳及待退還等4類款項。" },
-    { id: 47, diff: "mid", q: "依國軍各級單位現金會計作業規定，試問各種傳票應為下列各款之記載？", a: "（1）年、月、日。（2）會計科目。（3）事由。（4）新臺幣數目。（5）有關之原始憑證種類、張數及其號數、日期。（6）傳票號碼。（7）其他備查要點。" },
-    { id: 48, diff: "mid", q: "各種傳票非經何項人員簽名或蓋章不生效力？", a: "（1）單位主官。（2）業務之主管或主辦人員。（3）主辦會計人員。（4）主辦出納事務人員。（5）製票員。（6）登記員。" },
-    { id: 49, diff: "mid", q: "人事薪給資料查核時機為何？", a: "（1）支薪單位人員異動。（2）支薪單位編制修訂。（3）每半年實施人事薪給資料查核乙次。" },
-    { id: 50, diff: "mid", q: "各機關繳納公用事業費款（如水電費、電信費、瓦斯費等）應取得何種支出憑證？", a: "得以繳費通知單作為支出憑證；如赴公用事業營業處所或代收機構繳納者，並應檢附取得之繳款證明。" },
-    { id: 51, diff: "mid", q: "基層單位財務業務集中後，如何辦理經費結報？", a: "案件結報應檢附原始憑證等資料會辦預財組審核，並簽奉業務集中單位主官（或授權人）核定後，案移預財組辦理付款作業。" },
-    { id: 52, diff: "mid", q: "各級正（副）主官移交後，前任主官行政費餘額是否追減報繳？", a: "應於任期內辦理行政費支用，倘未支畢餘額不得納入移交，應辦理繳回。" },
-    { id: 53, diff: "mid", q: "各級單位慰問金經費來源如何？", a: "各軍種司令部、指揮部（含）以上單位辦理慰問工作，其所需經費，由「政戰綜合作業」、「其他作業」及「動員整備」等科目項下支應。" },
-    { id: 54, diff: "mid", q: "「國軍人員申領各項補助費精進計畫」之目的為何？", a: "簡化基層業務負荷，落實有感服務，使國軍人員於戶政事務所辦理結婚出生或死亡登記時，即可同步通報，以利快速獲撥補助款項。" },
-    { id: 55, diff: "mid", q: "國軍人員留薪範圍及方式？", a: "（1）範圍：薪俸、考績獎金及年終獎金。（2）方式：薪俸區分定額轉存、餘額轉存及全額轉存；考績獎金及年終獎金區分全額轉存或不轉存。" },
-    { id: 56, diff: "mid", q: "試述申領結婚補助費應檢附之要件為何？", a: "（1）戶口名簿影本、結婚證書。如新式戶口名簿影本或戶籍謄本得確認親屬關係、事實發生日期、法律效果，得替代上開證明文件。（2）結婚補助費證明冊。" },
-    { id: 57, diff: "mid", q: "依國軍官兵止伙作業規定，申請止伙作業程序？", a: "應於事由起始日3日前填具止伙申請單，向所屬單位提出申請，遇不可抗拒因素得檢附相關證明（派令、電話紀錄等）辦理。" },
-    { id: 58, diff: "mid", q: "國軍官兵由財務單位發放之各項加給主要區分幾種類型？", a: "（1）專業加給。（2）主管職務加給。（3）志願役加給。（4）勤務性加給。（5）地域加給。（6）戰鬥加給。" },
-    { id: 59, diff: "mid", q: "勤務性個別給與支領應具備之基本條件為何？", a: "（1）實際佔該項編制職缺。（2）具有該項勤務專長（技能）者。（3）實際服行該項勤務者。" },
-    { id: 60, diff: "mid", q: "依國軍勞軍款處理作業規定第3及4條，貴單位為營級單位，如接獲勞軍款8萬元，請問應於收款後幾日內由何部門完成收支計畫編製，呈報何權責單位核定？", a: "應於收款後10個工作日內由政戰部門編製收支計畫，呈報上一級單位主辦主計軍官副署後，由所隸預算支用單位主官核定。" },
-    { id: 61, diff: "mid", q: "依政府支出憑證處理要點第9點，各機關依法提存之款項，其支出憑證為何？", a: "各機關依法提存之款項，應取得國庫存款收款書及由經手人簽名之提存書影本，作為支出憑證。" },
-    { id: 62, diff: "mid", q: "依軍費預算執行及支付結報規定第8條第3項，自辦理暫付之日起，最遲不得超過幾天？", a: "除外購案預付款等無法取得憑證結報者外，最遲不得超過45天（含例假日）。" },
-    { id: 63, diff: "mid", q: "依會計法第22條，會計報告分為那2項？", a: "（1）靜態之會計報告：表示一定日期之財務狀況。（2）動態之會計報告：表示一定期間內之財務變動經過情形。" },
-    { id: 64, diff: "mid", q: "依軍費預算執行及支付結報規定第3項，軍費預算之執行及支付結報區分哪幾類？", a: "（1）分配預算編造。（2）預算分配。（3）預算簽證支用。（4）費款支付。（5）憑證存管。（6）預算保留作業。" },
-    { id: 65, diff: "mid", q: "依決算法第3條，試問政府之決算有哪5種？", a: "總決算、單位決算、單位決算之分決算、附屬單位決算、附屬單位決算之分決算。" },
-    { id: 66, diff: "mid", q: "依國軍各級單位現金會計作業規定第71條，試問單位每月各項傳票及原始憑證應如何處置？", a: "應按聯別、傳票種類、日期及編號順序分月裝訂成冊，另加封面，封面上填記年度、月份、傳票張數及起訖號數，妥慎保管備核。" },
-    { id: 67, diff: "mid", q: "基層單位財務業務集中後，預財士可否擔任採購案承辦人員？", a: "因預財士為單位監辦人員，故不得為購案承辦人員，惟可協助審查購辦案件程序。" },
-    { id: 68, diff: "mid", q: "統一發票是否須加蓋負責人私章？", a: "依政府支出憑證處理要點，並未要求統一發票應載明負責人之姓名。" },
-    { id: 69, diff: "mid", q: "代收款之收付保管原則為何？", a: "均應依「統收統支」原則由財務中心所屬地區財務單位統一辦理，各單位不得自為現金收支，或截留坐支。" },
-    { id: 70, diff: "mid", q: "試述部隊特別補助之支用規定？", a: "單位主官為加強領導統御，發揮即時犒賞部屬之獎勵（含獎金、獎品）及購置慰問品等所需費用。" },
-    { id: 71, diff: "mid", q: "試述炊具費其之支用規定？", a: "專供廚房、餐廳、消耗（零星）性用品補充及清潔用品、引火材料等費用，如有結餘，仍應用於副食。" },
-    { id: 72, diff: "mid", q: "常備兵役軍事訓練人員之退伍旅費支給標準為何？", a: "退員戶籍地址距離單位所在地未達60公里者，報支200元，60公里以上者，報支600元。" },
+    {"id": 37, "diff": "mid", "q": "年度考績獎金發放對象為何？", "a": "（1）國軍志願役官兵考績年度內任職服勤滿6個月以上。（2）考績績等合於發給獎金規範。"},
+    {"id": 38, "diff": "mid", "q": "歲入預算收入款項應繳金額，如不能一次繳清時，應如何辦理？", "a": "得由填製單位於收入憑單附記欄內填註應繳總額及原因後，先按實收金額送繳，爾後分次補繳時，不須檢附文件。"},
+    {"id": 39, "diff": "mid", "q": "國防部所屬各級單位主官及副主官行政費，動支對象為何？", "a": "各級部隊、機關單位指揮官、副指揮官及中校以上主官、副主官等。"},
+    {"id": 40, "diff": "mid", "q": "依國軍各級單位現金會計作業規定，會計報告區分那些？", "a": "（1）日報：現金結存日報表。（2）月報：平衡表、總分類帳各明細分類帳科目餘額明細表、現金餘額分析表。"},
+    {"id": 41, "diff": "mid", "q": "何謂甲種財務代理人？", "a": "財務單位在特殊情況下，得應預算支用單位之請求，臨時指派財務官於指定地點辦理費款支付事宜者。"},
+    {"id": 42, "diff": "mid", "q": "依強化基層部隊財務管理內部控制具體作法，主計部門對預財組之檢查，除應依「群（營、連）級單位自我檢查督檢項目」逐項檢核外，應依業務特性實需，適時增訂檢查項目，驗證重點項目為何？", "a": "（1）預財組人員職務異動業務移交清點。（2）印鑑設置及保管。（3）支票簽發及支票登記簿登載。（4）會計檔案存管。"},
+    {"id": 43, "diff": "mid", "q": "試問會計日報表編報期限為何？", "a": "以截至當日終了時之帳載資料編報之，並應於次一工作天12時前送達單位主官核閱。"},
+    {"id": 44, "diff": "mid", "q": "依國軍各級單位現金會計作業規定，試問墊借款之定義為何？", "a": "因業務需要先行墊借之款項或借予業務部門之業務週轉金均屬之。"},
+    {"id": 45, "diff": "mid", "q": "團體獎金之運用範圍為何？試述之。", "a": "應置重點於改善官兵福利及增進官兵權益，如個人獎金（品）、餐會、自強活動暨其他屬團體性之支出事項。"},
+    {"id": 46, "diff": "mid", "q": "依據國軍各級單位現金會計作業規定，試問暫收款之定義為何？", "a": "凡性質尚未確定之各項待查明、領回轉發、待解繳及待退還等4類款項。"},
+    {"id": 47, "diff": "mid", "q": "依國軍各級單位現金會計作業規定，試問各種傳票應為下列各款之記載？", "a": "（1）年、月、日。（2）會計科目。（3）事由。（4）新臺幣數目。（5）有關之原始憑證種類、張數及其號數、日期。（6）傳票號碼。（7）其他備查要點。"},
+    {"id": 48, "diff": "mid", "q": "各種傳票非經何項人員簽名或蓋章不生效力？", "a": "（1）單位主官。（2）業務之主管或主辦人員。（3）主辦會計人員。（4）主辦出納事務人員。（5）製票員。（6）登記員。"},
+    {"id": 49, "diff": "mid", "q": "人事薪給資料查核時機為何？", "a": "（1）支薪單位人員異動。（2）支薪單位編制修訂。（3）每半年實施人事薪給資料查核乙次。"},
+    {"id": 50, "diff": "mid", "q": "各機關繳納公用事業費款（如水電費、電信費、瓦斯費等）應取得何種支出憑證？", "a": "得以繳費通知單作為支出憑證；如赴公用事業營業處所或代收機構繳納者，並應檢附取得之繳款證明。"},
+    {"id": 51, "diff": "mid", "q": "基層單位財務業務集中後，如何辦理經費結報？", "a": "案件結報應檢附原始憑證等資料會辦預財組審核，並簽奉業務集中單位主官（或授權人）核定後，案移預財組辦理付款作業。"},
+    {"id": 52, "diff": "mid", "q": "各級正（副）主官移交後，前任主官行政費餘額是否追減報繳？", "a": "應於任期內辦理行政費支用，倘未支畢餘額不得納入移交，應辦理繳回。"},
+    {"id": 53, "diff": "mid", "q": "各級單位慰問金經費來源如何？", "a": "各軍種司令部、指揮部（含）以上單位辦理慰問工作，其所需經費，由「政戰綜合作業」、「其他作業」及「動員整備」等科目項下支應。"},
+    {"id": 54, "diff": "mid", "q": "「國軍人員申領各項補助費精進計畫」之目的為何？", "a": "簡化基層業務負荷，落實有感服務，使國軍人員於戶政事務所辦理結婚出生或死亡登記時，即可同步通報，以利快速獲撥補助款項。"},
+    {"id": 55, "diff": "mid", "q": "國軍人員留薪範圍及方式？", "a": "（1）範圍：薪俸、考績獎金及年終獎金。（2）方式：薪俸區分定額轉存、餘額轉存及全額轉存；考績獎金及年終獎金區分全額轉存或不轉存。"},
+    {"id": 56, "diff": "mid", "q": "試述申領結婚補助費應檢附之要件為何？", "a": "（1）戶口名簿影本、結婚證書。如新式戶口名簿影本或戶籍謄本得確認親屬關係、事實發生日期、法律效果，得替代上開證明文件。（2）結婚補助費證明冊。"},
+    {"id": 57, "diff": "mid", "q": "依國軍官兵止伙作業規定，申請止伙作業程序？", "a": "應於事由起始日3日前填具止伙申請單，向所屬單位提出申請，遇不可抗拒因素得檢附相關證明（派令、電話紀錄等）辦理。"},
+    {"id": 58, "diff": "mid", "q": "國軍官兵由財務單位發放之各項加給主要區分幾種類型？", "a": "（1）專業加給。（2）主管職務加給。（3）志願役加給。（4）勤務性加給。（5）地域加給。（6）戰鬥加給。"},
+    {"id": 59, "diff": "mid", "q": "勤務性個別給與支領應具備之基本條件為何？", "a": "（1）實際佔該項編制職缺。（2）具有該項勤務專長（技能）者。（3）實際服行該項勤務者。"},
+    {"id": 60, "diff": "mid", "q": "依國軍勞軍款處理作業規定第3及4條，貴單位為營級單位，如接獲勞軍款8萬元，請問應於收款後幾日內由何部門完成收支計畫編製，呈報何權責單位核定？", "a": "應於收款後10個工作日內由政戰部門編製收支計畫，呈報上一級單位主辦主計軍官副署後，由所隸預算支用單位主官核定。"},
+    {"id": 61, "diff": "mid", "q": "依政府支出憑證處理要點第9點，各機關依法提存之款項，其支出憑證為何？", "a": "各機關依法提存之款項，應取得國庫存款收款書及由經手人簽名之提存書影本，作為支出憑證。"},
+    {"id": 62, "diff": "mid", "q": "依軍費預算執行及支付結報規定第8條第3項，自辦理暫付之日起，最遲不得超過幾天？", "a": "除外購案預付款等無法取得憑證結報者外，最遲不得超過45天（含例假日）。"},
+    {"id": 63, "diff": "mid", "q": "依會計法第22條，會計報告分為那2項？", "a": "（1）靜態之會計報告：表示一定日期之財務狀況。（2）動態之會計報告：表示一定期間內之財務變動經過情形。"},
+    {"id": 64, "diff": "mid", "q": "依軍費預算執行及支付結報規定第3項，軍費預算之執行及支付結報區分哪幾類？", "a": "（1）分配預算編造。（2）預算分配。（3）預算簽證支用。（4）費款支付。（5）憑證存管。（6）預算保留作業。"},
+    {"id": 65, "diff": "mid", "q": "依決算法第3條，試問政府之決算有哪5種？", "a": "總決算、單位決算、單位決算之分決算、附屬單位決算、附屬單位決算之分決算。"},
+    {"id": 66, "diff": "mid", "q": "依國軍各級單位現金會計作業規定第71條，試問單位每月各項傳票及原始憑證應如何處置？", "a": "應按聯別、傳票種類、日期及編號順序分月裝訂成冊，另加封面，封面上填記年度、月份、傳票張數及起訖號數，妥慎保管備核。"},
+    {"id": 67, "diff": "mid", "q": "基層單位財務業務集中後，預財士可否擔任採購案承辦人員？", "a": "因預財士為單位監辦人員，故不得為購案承辦人員，惟可協助審查購辦案件程序。"},
+    {"id": 68, "diff": "mid", "q": "統一發票是否須加蓋負責人私章？", "a": "依政府支出憑證處理要點，並未要求統一發票應載明負責人之姓名。"},
+    {"id": 69, "diff": "mid", "q": "代收款之收付保管原則為何？", "a": "均應依「統收統支」原則由財務中心所屬地區財務單位統一辦理，各單位不得自為現金收支，或截留坐支。"},
+    {"id": 70, "diff": "mid", "q": "試述部隊特別補助之支用規定？", "a": "單位主官為加強領導統御，發揮即時犒賞部屬之獎勵（含獎金、獎品）及購置慰問品等所需費用。"},
+    {"id": 71, "diff": "mid", "q": "試述炊具費其之支用規定？", "a": "專供廚房、餐廳、消耗（零星）性用品補充及清潔用品、引火材料等費用，如有結餘，仍應用於副食。"},
+    {"id": 72, "diff": "mid", "q": "常備兵役軍事訓練人員之退伍旅費支給標準為何？", "a": "退員戶籍地址距離單位所在地未達60公里者，報支200元，60公里以上者，報支600元。"},
 
-    // 🔴 難 (18題, id: 73~90)
-    { id: 73, diff: "hard", q: "依各級單位對經管財務行政人員實施內部控制之「自我檢查」作業範圍？", a: "（1）預算執行。（2）會計處理。（3）現金收支。（4）財產保管。（5）採購及處分財物。（6）領回轉發案件（含營外欠款情形）。（7）補助費跨機關通報案件。（8）主計部門財務輔檢督導情形。（9）臨時交辦及其他重要事項。" },
-    { id: 74, diff: "hard", q: "試述國防部所屬各級單位主官及副主官特別費使用範圍？", a: "（1）贈送婚喪喜慶之禮金、奠儀、禮品、花籃（圈）、喜幛、輓聯、中堂及匾額等支出。（2）對本單位及所屬單位人員以實物之獎（犒）賞、慰勞（問）及餐敘等支出。（3）對外部單位（即本單位及所屬單位以外之單位）、民間團體與有關人士等之招待、餽（捐）贈及慰問等支出。" },
-    { id: 75, diff: "hard", q: "依國防部所屬單位歲入預算及預算外庫款收退作業規定，各單位依法應解繳國庫之款項，其範圍包括？", a: "（一）歲入預算：1.罰款及賠償收入。2.規費收入。3.財產收入。4.營業盈餘及事業收入。5.其他收入。（二）預算外庫款：1.剔除經費。2.以前年度減列經費。3.以前年度押金收回。4.其他以前年度經費賸餘。" },
-    { id: 76, diff: "hard", q: "基層單位財務業務集中優點為何？", a: "（1）減少國庫支票開立次數。（2）降低洽公次數。（3）提升預財士官編階，提高留營意願。（4）憑證集中保管、降低遺失風險。（5）人員集中編設可互為代理，良性互動教學相長。（6）連級會計月報由上級代編。" },
-    { id: 77, diff: "hard", q: "試述申領生育補助費應具備之申領資格？", a: "（1）志願役官兵及文職人員，申領者以配偶或本人分娩或早產者為限。（2）因早產申請生育補助需妊娠週數大於20週，小於37週生產。（3）本人或配偶分娩或早產為雙生以上者，另增給生育補助，雙胞胎者，給與二個月本俸；三胞胎者，給與四個月本俸；四胞胎以上者類推之。" },
-    { id: 78, diff: "hard", q: "國軍計畫預算制度之目的？", a: "（1）密切配合國家目標。（2）明確設計國軍兵力整建目標。（3）研究分析有關備選方案，貫徹政策節約。（4）顯示未來5年之全般需求，分期貫徹執行。（5）確保戰略目標與資源相結合，並經濟有效運用國家資源。" },
-    { id: 79, diff: "hard", q: "依國軍各級單位主計及出納人員交代作業規定，經管財務人員交接事項內容應包含哪些？", a: "（1）會計業務：經管之現金收支登記簿、各帳戶餘額明細資料、會計檔案、會計業務用品、會計法令規章、會計類待辦事項及其他有關會計業務應交代事項等。（2）出納業務：經管之各項現金、票據、銀行存款等及銀行存款調節表、各項原始憑證及支票、領款收據（存根）、出納業務用品、出納法令規章、出納類待辦事項及其他有關出納業務應交代事項等。" },
-    { id: 80, diff: "hard", q: "依國軍各單位經管款項存款帳戶管制規定第16條，試述國庫支票作廢之處理程序？", a: "應予打洞註銷，在票面加蓋作廢戳記後，黏貼於原支票存根，並記入支票登記簿備查；國庫支票如係票面記載錯誤而致作廢時，應將票面記載之文字及金額劃二道紅線予以註銷，並塗銷已蓋妥之印鑑章，將支票號碼剪下貼附於支票領取證背面繳回，將作廢支票黏貼於原支票存根存查，並於支票登記簿登錄備查。" },
-    { id: 81, diff: "hard", q: "依國軍各單位經管款項存款帳戶管制規定，試述單位承辦簽發國庫專戶存款支票人員調動時之處理程序？", a: "（1）將經管支票存根、作廢支票、未簽發之空白支票及支票領取證等列入移交。（2）辦理國庫專戶印鑑更換（逕向國庫索取「國庫更換印鑑申請書」及新印鑑卡）。（3）向國庫申請存款餘額證明書。" },
-    { id: 82, diff: "hard", q: "依「國軍國內出差旅費報支規定」可申領旅費項目為何？並簡述之", a: "（1）交通費：包括出差行程中必須搭乘之飛機、高鐵、船舶、火車、汽車、捷運、公共自行車等費用，均覈實報支；單位專備交通工具或出差人員領有免費票或搭乘便車者，不得報支交通費。搭乘飛機、高鐵、座（艙）位有分等之船舶、火車者，報支交通費時，應檢附票根或購票證明文件。駕駛自用汽車、機車出差者，其交通費得按必要路程之公里數（尾數不足一公里者，進位為一公里），汽車以每公里新臺幣三元、機車二元報支。（2）住宿費：出差地點距離單位所在地60公里以上，且有住宿事實者，得在依數額表所列基準內（平日：3,500元；假日：4,500元），檢據核實報支。（3）雜費：依實際行程達4小時以上得報支400元；未滿4小時者，得報支200元，不含提前出發及延後返回所需路程時間。" },
-    { id: 83, diff: "hard", q: "依國軍各單位經管款項存款帳戶管制規定第4條，試述單位撤銷或費款清結時之作業程序？", a: "（1）結清存款帳戶。（2）連同未用剩餘空白國庫支票（含作廢支票）及支票領取證，加蓋作廢章後，應填具「國庫機關專戶存款銷戶通知書」（逕向國庫索取），加蓋全部印鑑章及正式印信，一併送交國庫銷戶。（3）單位銷戶完成取具「國庫帳戶銷戶回單」，持向財務單位登記單位國庫專戶基本資料異動。" },
-    { id: 84, diff: "hard", q: "國軍各級單位強化墊借款管制作業原則為何？", a: "妥適律定核判層級，依作業實需及財務業務集中現況妥適律定，避免因程序繁瑣影響承辦人員墊借意願，支出事項金額為五千元（不含）以上者，應優先以墊借方式辦理，若無墊借需求，須於申購時註記。" },
-    { id: 85, diff: "hard", q: "收領款收據因開具錯誤或收款事由消滅而作廢者，應如何處理？", a: "（1）收領款收據因開具錯誤或收款事由消滅而作廢者，須於系統確實查填作廢原因。（2）由原開據單位收回後加蓋作廢章（一式二份）。（3）併同當月份會計報告妥存備查。" },
-    { id: 86, diff: "hard", q: "基層單位簽發國庫支票時，應設置何種簿冊，其注意事項為何？", a: "支票簽發應設置「支票登記及現金檢查紀錄簿」，應由出納人員依使用情形逐筆登載於登記簿內（支票作廢亦應登載），並由各級印鑑保管人員於用印時，核對支票號碼、金額及受款人等資訊正確無誤後，於登記簿內簽名負責。" },
-    { id: 87, diff: "hard", q: "依國軍志願役軍官士官及志願士兵考績作業規定第117條規定，年度考績獎金核發標準為何？", a: "核發基準：依考績核定當月（1月1日）所任職務之俸給總額（薪俸、專業加給及主管職務加給）按下列標準發給：（1）績等「甲等」以上者：發給一個月俸給總額；已晉至本階最高俸級者（含志願役上兵），發給二個月俸給總額。（2）績等「乙上」者：發給半個月俸給總額；已晉至本階最高俸級者（含志願役上兵），發給一個半月俸給總額。（3）績等「乙等」以下者：不核發考績獎金。[cite: 1] " },
-    { id: 88, diff: "hard", q: "依據審計法第2條規定，試問審計職權為何？", a: "（1）監督預算之執行。（2）核定收支命令。（3）審核財務收支，審定決算。（4）稽察財物及財政上之不法或不忠於職務之行為。（5）考核財務效能。（6）核定財務責任。（7）其他依法律應行辦理之審計事項。" },
-    { id: 89, diff: "hard", q: "機關採購多項財物或勞務而取得廠商提供固定金額折扣，是否須將該金額平均分攤於普通收據或統一發票各項目？", a: "機關取得支出憑證，係為證明支付事實，倘廠商提供折讓未明確歸屬任一項目，其開立普通收據或統一發票以總額減項方式記明，亦可證明支付事實，無須將金額平均分攤於各項目。" },
-    { id: 90, diff: "hard", q: "依國軍各單位經管款項存款帳戶管制規定第8條，國庫專戶存款支票印鑑必須有哪些人員蓋章，並負連帶責任？", a: "（1）單位主官或其職務代理人。（2）主辦主計（會計）人員或其職務代理人（非預算支用單位原則上以單位輔導長兼辦，無輔導長編制則由主官指派適合職務代理人兼辦）。（3）承辦簽發支票承辦人或其職務代理人。" }
+    {"id": 73, "diff": "hard", "q": "依各級單位對經管財務行政人員實施內部控制之「自我檢查」作業範圍？", "a": "（1）預算執行。（2）會計處理。（3）現金收支。（4）財產保管。（5）採購及處分財物。（6）領回轉發案件（含營外欠款情形）。（7）補助費跨機關通報案件。（8）主計部門財務輔檢督導情形。（9）臨時交辦及其他重要事項。"},
+    {"id": 74, "diff": "hard", "q": "試述國防部所屬各級單位主官及副主官特別費使用範圍？", "a": "（1）贈送婚喪喜慶之禮金、奠儀、禮品、花籃（圈）、喜幛、輓聯、中堂及匾額等支出。（2）對本單位及所屬單位人員以實物之獎（犒）賞、慰勞（問）及餐敘等支出。（3）對外部單位（即本單位及所屬單位以外之單位）、民間團體與有關人士等之招待、餽（捐）贈及慰問等支出。"},
+    {"id": 75, "diff": "hard", "q": "依國防部所屬單位歲入預算及預算外庫款收退作業規定，各單位依法應解繳國庫之款項，其範圍包括？", "a": "（一）歲入預算：1.罰款及賠償收入。2.規費收入。3.財產收入。4.營業盈餘及事業收入。5.其他收入。（二）預算外庫款：1.剔除經費。2.以前年度減列經費。3.以前年度押金收回。4.其他以前年度經費賸餘。"},
+    {"id": 76, "diff": "hard", "q": "基層單位財務業務集中優點為何？", "a": "（1）減少國庫支票開立次數。（2）降低洽公次數。（3）提升預財士官編階，提高留營意願。（4）憑證集中保管、降低遺失風險。（5）人員集中編設可互為代理，良性互動教學相長。（6）連級會計月報由上級代編。"},
+    {"id": 77, "diff": "hard", "q": "試述申領生育補助費應具備之申領資格？", "a": "（1）志願役官兵及文職人員，申領者以配偶或本人分娩或早產者為限。（2）因早產申請生育補助需妊娠週數大於20週，小於37週生產。（3）本人或配偶分娩或早產為雙生以上者，另增給生育補助，雙胞胎者，給與二個月本俸；三胞胎者，給與四個月本俸；四胞胎以上者類推之。"},
+    {"id": 78, "diff": "hard", "q": "國軍計畫預算制度之目的？", "a": "（1）密切配合國家目標。（2）明確設計國軍兵力整建目標。（3）研究分析有關備選方案，貫徹政策節約。（4）顯示未來5年之全般需求，分期貫徹執行。（5）確保戰略目標與資源相結合，並經濟有效運用國家資源。"},
+    {"id": 79, "diff": "hard", "q": "依國軍各級單位主計及出納人員交代作業規定，經管財務人員交接事項內容應包含哪些？", "a": "（1）會計業務：經管之現金收支登記簿、各帳戶餘額明細資料、會計檔案、會計業務用品、會計法令規章、會計類待辦事項及其他有關會計業務應交代事項等。（2）出納業務：經管之各項現金、票據、銀行存款等及銀行存款調節表、各項原始憑證及支票、領款收據（存根）、出納業務用品、出納法令規章、出納類待辦事項及其他有關出納業務應交代事項等。"},
+    {"id": 80, "diff": "hard", "q": "依國軍各單位經管款項存款帳戶管制規定第16條，試述國庫支票作廢之處理程序？", "a": "應予打洞註銷，在票面加蓋作廢戳記後，黏貼於原支票存根，並記入支票登記簿備查；國庫支票如係票面記載錯誤而致作廢時，應將票面記載之文字及金額劃二道紅線予以註銷，並塗銷已蓋妥之印鑑章，將支票號碼剪下貼附於支票領取證背面繳回，將作廢支票黏貼於原支票存根存查，並於支票登記簿登錄備查。"},
+    {"id": 81, "diff": "hard", "q": "依國軍各單位經管款項存款帳戶管制規定，試述單位承辦簽發國庫專戶存款支票人員調動時之處理程序？", "a": "（1）將經管支票存根、作廢支票、未簽發之空白支票及支票領取證等列入移交。（2）辦理國庫專戶印鑑更換（逕向國庫索取「國庫更換印鑑申請書」及新印鑑卡）。（3）向國庫申請存款餘額證明書。"},
+    {"id": 82, "diff": "hard", "q": "依「國軍國內出差旅費報支規定」可申領旅費項目為何？並簡述之", "a": "（1）交通費：包括出差行程中必須搭乘之飛機、高鐵、船舶、火車、汽車、捷運、公共自行車等費用，均覈實報支；單位專備交通工具或出差人員領有免費票或搭乘便車者，不得報支交通費。搭乘飛機、高鐵、座（艙）位有分等之船舶、火車者，報支交通費時，應檢附票根或購票證明文件。駕駛自用汽車、機車出差者，其交通費得按必要路程之公里數（尾數不足一公里者，進位為一公里），汽車以每公里新臺幣三元、機車二元報支。（2）住宿費：出差地點距離單位所在地60公里以上，且有住宿事實者，得在依數額表所列基準內（平日：3,500元；假日：4,500元），檢據核實報支。（3）雜費：依實際行程達4小時以上得報支400元；未滿4小時者，得報支200元，不含提前出發及延後返回所需路程時間。"},
+    {"id": 83, "diff": "hard", "q": "依國軍各單位經管款項存款帳戶管制規定第4條，試述單位撤銷或費款清結時之作業程序？", "a": "（1）結清存款帳戶。（2）連同未用剩餘空白國庫支票（含作廢支票）及支票領取證，加蓋作廢章後，應填具「國庫機關專戶存款銷戶通知書」（逕向國庫索取），加蓋全部印鑑章及正式印信，一併送交國庫銷戶。（3）單位銷戶完成取具「國庫帳戶銷戶回單」，持向財務單位登記單位國庫專戶基本資料異動。"},
+    {"id": 84, "diff": "hard", "q": "國軍各級單位強化墊借款管制作業原則為何？", "a": "妥適律定核判層級，依作業實需及財務業務集中現況妥適律定，避免因程序繁瑣影響承辦人員墊借意願，支出事項金額為五千元（不含）以上者，應優先以墊借方式辦理，若無墊借需求，須於申購時註記。"},
+    {"id": 85, "diff": "hard", "q": "收領款收據因開具錯誤或收款事由消滅而作廢者，應如何處理？", "a": "（1）收領款收據因開具錯誤或收款事由消滅而作廢者，須於系統確實查填作廢原因。（2）由原開據單位收回後加蓋作廢章（一式二份）。（3）併同當月份會計報告妥存備查。"},
+    {"id": 86, "diff": "hard", "q": "基層單位簽發國庫支票時，應設置何種簿冊，其注意事項為何？", "a": "支票簽發應設置「支票登記及現金檢查紀錄簿」，應由出納人員依使用情形逐筆登載於登記簿內（支票作廢亦應登載），並由各級印鑑保管人員於用印時，核對支票號碼、金額及受款人等資訊正確無誤後，於登記簿內簽名負責。"},
+    {"id": 87, "diff": "hard", "q": "依國軍志願役軍官士官及志願士兵考績作業規定第117條規定，年度考績獎金核發標準為何？", "a": "核發基準：依考績核定當月（1月1日）所任職務之俸給總額（薪俸、專業加給及主管職務加給）按下列標準發給：（1）績等「甲等」以上者：發給一個月俸給總額；已晉至本階最高俸級者（含志願役上兵），發給二個月俸給總額。（2）績等「乙上」者：發給半個月俸給總額；已晉至本階最高俸級者（含志願役上兵），發給一個半月俸給總額。（3）績等「乙等」以下者：不核發考績獎金。"},
+    {"id": 88, "diff": "hard", "q": "依據審計法第2條規定，試問審計職權為何？", "a": "（1）監督預算之執行。（2）核定收支命令。（3）審核財務收支，審定決算。（4）稽察財物及財政上之不法或不忠於職務之行為。（5）考核財務效能。（6）核定財務責任。（7）其他依法律應行辦理之審計事項。"},
+    {"id": 89, "diff": "hard", "q": "機關採購多項財物或勞務而取得廠商提供固定金額折扣，是否須將該金額平均分攤於普通收據或統一發票各項目？", "a": "機關取得支出憑證，係為證明支付事實，倘廠商提供折讓未明確歸屬任一項目，其開立普通收據或統一發票以總額減項方式記明，亦可證明支付事實，無須將金額平均分攤於各項目。"},
+    {"id": 90, "diff": "hard", "q": "依國軍各單位經管款項存款帳戶管制規定第8條，國庫專戶存款支票印鑑必須有哪些人員蓋章，並負連帶責任？", "a": "（1）單位主官或其職務代理人。（2）主辦主計（會計）人員或其職務代理人（非預算支用單位原則上以單位輔導長兼辦，無輔導長編制則由主官指派適合職務代理人兼辦）。（3）承辦簽發支票承辦人或其職務代理人。"}
 ];
 
 let masteredSet = new Set(JSON.parse(localStorage.getItem('mastered_questions_stage3') || '[]'));
@@ -894,8 +874,6 @@ function handleModeChange() {
         document.getElementById('label-count').textContent = mode === 'weakness' ? `弱點專攻題數 (未熟記共 ${unmasteredTotal} 題)：` : `抽取題數 (排除熟記後共 ${unmasteredTotal} 題)：`;
     } else if (mode === 'custom') {
         pCustom.classList.remove('hidden');
-    } else if (mode === 'exam') {
-        // 實戰限時固定30題
     }
 }
 
@@ -1085,7 +1063,7 @@ function giveHint() {
 
 function cleanSmartText(s) {
     return s ? s.replace(/[\s\(\)（）\.,，。、:：;；—\-_【】「」『』]/g, '')
-                .replace(/[0-9０-氣]/g, '').toLowerCase().trim() : '';
+                .replace(/[0-9０-９]/g, '').toLowerCase().trim() : '';
 }
 
 function normalizeExactText(s) {
@@ -1314,23 +1292,51 @@ function restartQuiz() {
 }
 
 /* ========================================================
-   🎴 智慧字卡背誦系統（支援絲滑滑動與人體工學操控）
+   🎴 智慧字卡背誦系統（跟手拖曳 + 獨立題庫範圍切換）
    ======================================================== */
-function startFlashcards() {
-    const selected = getSelectedPool();
-    if (!selected || selected.length === 0) return;
-
-    cardList = selected.sort(() => 0.5 - Math.random());
-    cardIndex = 0;
-    isCardFlipped = false;
-    isAnimating = false;
-
+function openFlashcardSetup() {
     document.getElementById('view-setup').classList.add('hidden');
     document.getElementById('view-quiz').classList.add('hidden');
     document.getElementById('view-mastered').classList.add('hidden');
     document.getElementById('view-result').classList.add('hidden');
     document.getElementById('view-flashcard').classList.remove('hidden');
+    
+    // 預設以未熟記題庫開始
+    changeCardScope(document.getElementById('select-card-scope').value || 'unmastered');
+}
 
+function changeCardScope(scope) {
+    let pool = [];
+    if (scope === 'all') {
+        pool = [...RAW_QUESTIONS];
+    } else if (scope === 'unmastered') {
+        pool = RAW_QUESTIONS.filter(q => !masteredSet.has(q.id));
+        if (pool.length === 0) {
+            alert("🎉 所有題目均已標記熟記！已為您自動切換至「全部總題庫」。");
+            document.getElementById('select-card-scope').value = 'all';
+            pool = [...RAW_QUESTIONS];
+        }
+    } else if (scope === 'wrong') {
+        pool = RAW_QUESTIONS.filter(q => (wrongStats[q.id] || 0) > 0);
+        if (pool.length === 0) {
+            alert("👍 目前沒有任何常錯題目記錄！已為您切換至「全部總題庫」。");
+            document.getElementById('select-card-scope').value = 'all';
+            pool = [...RAW_QUESTIONS];
+        }
+    } else if (scope === 'easy') {
+        pool = RAW_QUESTIONS.filter(q => q.diff === 'easy');
+    } else if (scope === 'mid') {
+        pool = RAW_QUESTIONS.filter(q => q.diff === 'mid');
+    } else if (scope === 'hard') {
+        pool = RAW_QUESTIONS.filter(q => q.diff === 'hard');
+    } else if (scope === 'random30') {
+        pool = getRandomSubarray(RAW_QUESTIONS, 30);
+    }
+
+    cardList = pool.sort(() => 0.5 - Math.random());
+    cardIndex = 0;
+    isCardFlipped = false;
+    isAnimating = false;
     renderCardContent();
 }
 
@@ -1361,11 +1367,17 @@ function renderCardContent() {
     if (cardList.length === 0) return;
     const item = cardList[cardIndex];
     isCardFlipped = false;
+    
+    // 重設卡片位置與翻轉
     const card = document.getElementById('flashcard-card');
-    card.className = 'flashcard'; // reset animation classes
+    const inner = document.getElementById('flashcard-inner');
+    card.style.transition = 'none';
+    card.style.transform = 'translate(0px, 0px) rotate(0deg)';
+    card.style.opacity = '1';
+    inner.classList.remove('is-flipped');
     document.getElementById('btn-toggle-reveal').textContent = "全部揭曉";
 
-    document.getElementById('card-progress').textContent = `字卡：${cardIndex + 1} / ${cardList.length}`;
+    document.getElementById('card-progress').textContent = `📝 題目 (${cardIndex + 1}/${cardList.length})`;
     document.getElementById('card-q-text').textContent = item.q;
     
     if (isClozeActive) {
@@ -1386,14 +1398,9 @@ function renderCardContent() {
 function flipCard() {
     if (isAnimating) return;
     isCardFlipped = !isCardFlipped;
-    const card = document.getElementById('flashcard-card');
-    if (isCardFlipped) card.classList.add('is-flipped');
-    else card.classList.remove('is-flipped');
-}
-
-function handleCardClick(e) {
-    if (e.target.classList.contains('cloze-blank') || e.target.tagName === 'BUTTON' || e.target.closest('button')) return;
-    flipCard();
+    const inner = document.getElementById('flashcard-inner');
+    if (isCardFlipped) inner.classList.add('is-flipped');
+    else inner.classList.remove('is-flipped');
 }
 
 function toggleAllBlanks() {
@@ -1408,39 +1415,50 @@ function toggleAllBlanks() {
     btn.textContent = isAllRevealed ? "全部揭曉" : "全部隱藏";
 }
 
-function prevCard() {
-    if (isAnimating || cardIndex <= 0) return;
+function animateSlideTo(direction, onComplete) {
     isAnimating = true;
     const card = document.getElementById('flashcard-card');
-    card.classList.remove('slide-in-right', 'slide-in-left');
-    card.classList.add('slide-out-right');
+    const destX = (direction === 'left') ? -window.innerWidth * 1.1 : window.innerWidth * 1.1;
+    const rotate = (direction === 'left') ? -20 : 20;
+
+    card.style.transition = 'transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.25s ease';
+    card.style.transform = `translate(${destX}px, 20px) rotate(${rotate}deg)`;
+    card.style.opacity = '0';
 
     setTimeout(() => {
+        onComplete();
+        // 從另一側滑入
+        const startX = (direction === 'left') ? window.innerWidth * 0.9 : -window.innerWidth * 0.9;
+        card.style.transition = 'none';
+        card.style.transform = `translate(${startX}px, 0px) rotate(${(direction === 'left') ? 10 : -10}deg)`;
+        card.style.opacity = '0';
+
+        requestAnimationFrame(() => {
+            card.style.transition = 'transform 0.32s cubic-bezier(0.18, 0.89, 0.32, 1.15), opacity 0.28s ease';
+            card.style.transform = 'translate(0px, 0px) rotate(0deg)';
+            card.style.opacity = '1';
+            setTimeout(() => { isAnimating = false; }, 320);
+        });
+    }, 260);
+}
+
+function prevCard() {
+    if (isAnimating || cardIndex <= 0) return;
+    animateSlideTo('right', () => {
         cardIndex--;
         renderCardContent();
-        card.classList.remove('slide-out-right');
-        card.classList.add('slide-in-left');
-        setTimeout(() => { isAnimating = false; }, 280);
-    }, 250);
+    });
 }
 
 function nextCard() {
     if (isAnimating) return;
     if (cardIndex < cardList.length - 1) {
-        isAnimating = true;
-        const card = document.getElementById('flashcard-card');
-        card.classList.remove('slide-in-right', 'slide-in-left');
-        card.classList.add('slide-out-left');
-
-        setTimeout(() => {
+        animateSlideTo('left', () => {
             cardIndex++;
             renderCardContent();
-            card.classList.remove('slide-out-left');
-            card.classList.add('slide-in-right');
-            setTimeout(() => { isAnimating = false; }, 280);
-        }, 250);
+        });
     } else {
-        alert("🎉 本次字卡背誦已全部完成！");
+        alert("🎉 本題庫字卡已全部背誦完畢！");
         exitFlashcards();
     }
 }
@@ -1500,45 +1518,114 @@ function speakText(text) {
 }
 
 /* ========================================================
-   👆 觸控左右滑動手勢監聽 (Touch Gesture Listener)
+   👆 真實物理跟手拖曳滑動 (Real-time Physics Drag & Swipe)
    ======================================================== */
-let touchStartX = 0;
-let touchStartY = 0;
-let touchEndX = 0;
-let touchEndY = 0;
-let isSwiping = false;
+const card = document.getElementById('flashcard-card');
+let isDragging = false;
+let startX = 0;
+let startY = 0;
+let currentX = 0;
+let currentY = 0;
+let hasMoved = false;
 
-const touchZone = document.getElementById('flashcard-touch-zone');
+function onDragStart(clientX, clientY) {
+    if (isAnimating) return;
+    isDragging = true;
+    hasMoved = false;
+    startX = clientX;
+    startY = clientY;
+    currentX = clientX;
+    currentY = clientY;
+    card.style.transition = 'none';
+}
 
-touchZone.addEventListener('touchstart', (e) => {
-    touchStartX = e.changedTouches[0].screenX;
-    touchStartY = e.changedTouches[0].screenY;
-    isSwiping = true;
-}, { passive: true });
+function onDragMove(clientX, clientY) {
+    if (!isDragging || isAnimating) return;
+    currentX = clientX;
+    currentY = clientY;
+    const deltaX = currentX - startX;
+    const deltaY = currentY - startY;
 
-touchZone.addEventListener('touchend', (e) => {
-    if (!isSwiping) return;
-    touchEndX = e.changedTouches[0].screenX;
-    touchEndY = e.changedTouches[0].screenY;
-    handleSwipeGesture();
-    isSwiping = false;
-}, { passive: true });
+    if (Math.abs(deltaX) > 8 || Math.abs(deltaY) > 8) {
+        hasMoved = true;
+    }
 
-function handleSwipeGesture() {
-    const deltaX = touchEndX - touchStartX;
-    const deltaY = touchEndY - touchStartY;
-    
-    // 水平滑動位移 > 45px，且水平位移顯著大於垂直位移（避免與滾動衝突）
-    if (Math.abs(deltaX) > 45 && Math.abs(deltaX) > Math.abs(deltaY) * 1.35) {
+    // 跟手動態旋轉與位移
+    const rotation = deltaX * 0.06;
+    card.style.transform = `translate(${deltaX}px, ${deltaY * 0.25}px) rotate(${rotation}deg)`;
+    card.style.opacity = Math.max(0.4, 1 - Math.abs(deltaX) / (window.innerWidth * 0.95));
+}
+
+function onDragEnd() {
+    if (!isDragging || isAnimating) return;
+    isDragging = false;
+    const deltaX = currentX - startX;
+    const deltaY = currentY - startY;
+
+    // 拖曳位移超過 75px 視為滑脫成功
+    if (Math.abs(deltaX) > 75 && Math.abs(deltaX) > Math.abs(deltaY) * 1.1) {
         if (deltaX < 0) {
-            // 向左滑動 -> 下一張
-            nextCard();
+            // 左滑 -> 下一張
+            if (cardIndex < cardList.length - 1) {
+                animateSlideTo('left', () => { cardIndex++; renderCardContent(); });
+            } else {
+                alert("🎉 本題庫字卡已全部背誦完畢！");
+                exitFlashcards();
+            }
         } else {
-            // 向右滑動 -> 上一張
-            prevCard();
+            // 右滑 -> 上一張
+            if (cardIndex > 0) {
+                animateSlideTo('right', () => { cardIndex--; renderCardContent(); });
+            } else {
+                springBack();
+            }
+        }
+    } else {
+        if (!hasMoved) {
+            // 沒有滑動，單純點擊 -> 翻面
+            flipCard();
+        } else {
+            // 滑動距離不足 -> 絲滑回彈原位
+            springBack();
         }
     }
 }
+
+function springBack() {
+    card.style.transition = 'transform 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.25), opacity 0.25s ease';
+    card.style.transform = 'translate(0px, 0px) rotate(0deg)';
+    card.style.opacity = '1';
+}
+
+// 手機觸控事件綁定
+card.addEventListener('touchstart', (e) => {
+    if (e.target.classList.contains('cloze-blank') || e.target.closest('button')) return;
+    onDragStart(e.touches[0].clientX, e.touches[0].clientY);
+}, { passive: true });
+
+card.addEventListener('touchmove', (e) => {
+    if (!isDragging) return;
+    onDragMove(e.touches[0].clientX, e.touches[0].clientY);
+}, { passive: true });
+
+card.addEventListener('touchend', (e) => {
+    if (!isDragging) return;
+    onDragEnd();
+});
+
+// 電腦滑鼠拖曳事件綁定
+card.addEventListener('mousedown', (e) => {
+    if (e.target.classList.contains('cloze-blank') || e.target.closest('button')) return;
+    onDragStart(e.clientX, e.clientY);
+});
+
+window.addEventListener('mousemove', (e) => {
+    if (isDragging) onDragMove(e.clientX, e.clientY);
+});
+
+window.addEventListener('mouseup', () => {
+    if (isDragging) onDragEnd();
+});
 
 /* ========================================================
    📖 總題庫瀏覽與管理清單
