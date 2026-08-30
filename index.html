@@ -167,6 +167,21 @@
         }
         .mastered-toggle input { cursor: pointer; width: 16px; height: 16px; }
         
+        .pause-banner {
+            background-color: #fef3c7;
+            border: 1px solid #fde68a;
+            border-radius: 8px;
+            padding: 0.85rem 1rem;
+            margin-bottom: 1.15rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            color: #78350f;
+        }
+        .pause-title { font-weight: bold; font-size: 0.9rem; }
+        .pause-desc { font-size: 0.82rem; }
+        .pause-btns { display: flex; gap: 0.5rem; }
+
         .question-box { font-size: 1.05rem; font-weight: 600; margin-bottom: 1rem; line-height: 1.6; }
         .feedback { margin-top: 1rem; padding: 1rem; border-radius: 6px; }
         .feedback.correct { background-color: #dcfce7; border: 1px solid #bbf7d0; color: var(--success); }
@@ -313,6 +328,16 @@
             </div>
         </div>
 
+        <!-- 進行中進度恢復提示面板 -->
+        <div id="panel-paused-quiz" class="pause-banner hidden">
+            <div class="pause-title">📌 偵測到有尚未完成的測驗進度</div>
+            <div class="pause-desc" id="pause-status-desc">目前進度：第 1 題 / 共 30 題</div>
+            <div class="pause-btns">
+                <button class="btn btn-success" onclick="resumeQuiz()" style="font-size:0.85rem; padding:0.4rem 0.8rem;">▶️ 繼續未完成測驗</button>
+                <button class="btn btn-secondary" onclick="discardQuiz()" style="font-size:0.85rem; padding:0.4rem 0.8rem;">放棄進度</button>
+            </div>
+        </div>
+
         <div class="setup-group">
             <label for="select-mode">題目範圍與抽題模式：</label>
             <select id="select-mode" onchange="handleModeChange()">
@@ -405,7 +430,7 @@
                     <input type="checkbox" id="chk-mastered" onchange="toggleMastered(this.checked)">
                     <span>熟記</span>
                 </label>
-                <button class="btn-text-sm" id="btn-pause-quiz" type="button" style="font-weight:600; color:var(--text-muted);">⏸️ 暫停</button>
+                <button class="btn-text-sm" id="btn-pause-quiz" type="button" style="font-weight:600; color:var(--text-muted);">⏸️ 暫停回主頁</button>
             </div>
         </div>
         
@@ -801,7 +826,7 @@ function escapeHtml(str) {
     return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-/* ✍️ 打字測驗邏輯 */
+/* ✍️ 打字測驗邏輯（支援暫停與繼續進度） */
 function startQuiz() {
     activeMatchRule = document.getElementById('select-match-rule').value;
     const selected = getSelectedPool();
@@ -811,6 +836,7 @@ function startQuiz() {
     userAnswers = new Array(quizList.length).fill(null);
     currentIndex = 0;
     isQuizActive = true;
+    saveQuizSession();
 
     document.getElementById('view-setup').classList.add('hidden');
     document.getElementById('view-result').classList.add('hidden');
@@ -819,6 +845,73 @@ function startQuiz() {
     document.getElementById('view-quiz').classList.remove('hidden');
 
     showQuestion();
+}
+
+function saveQuizSession() {
+    if (!isQuizActive) {
+        localStorage.removeItem('quiz_session_nco_general');
+        renderPauseBanner();
+        return;
+    }
+    const session = { quizList, userAnswers, currentIndex, activeMatchRule };
+    localStorage.setItem('quiz_session_nco_general', JSON.stringify(session));
+    renderPauseBanner();
+}
+
+function renderPauseBanner() {
+    const raw = localStorage.getItem('quiz_session_nco_general');
+    const banner = document.getElementById('panel-paused-quiz');
+    if (!banner) return;
+    if (raw) {
+        try {
+            const session = JSON.parse(raw);
+            if (session.quizList && session.quizList.length > 0) {
+                banner.classList.remove('hidden');
+                document.getElementById('pause-status-desc').textContent = `目前進度：第 ${session.currentIndex + 1} 題 / 共 ${session.quizList.length} 題`;
+                return;
+            }
+        } catch(e) {}
+    }
+    banner.classList.add('hidden');
+}
+
+function resumeQuiz() {
+    const raw = localStorage.getItem('quiz_session_nco_general');
+    if (!raw) return;
+    try {
+        const session = JSON.parse(raw);
+        quizList = session.quizList;
+        userAnswers = session.userAnswers;
+        currentIndex = session.currentIndex;
+        activeMatchRule = session.activeMatchRule || 'smart';
+        isQuizActive = true;
+
+        document.getElementById('view-setup').classList.add('hidden');
+        document.getElementById('view-result').classList.add('hidden');
+        document.getElementById('view-mastered').classList.add('hidden');
+        document.getElementById('view-flashcard').classList.add('hidden');
+        document.getElementById('view-quiz').classList.remove('hidden');
+
+        showQuestion();
+    } catch(e) {
+        localStorage.removeItem('quiz_session_nco_general');
+        renderPauseBanner();
+    }
+}
+
+function discardQuiz() {
+    if (confirm("確定要放棄目前的測驗進度嗎？")) {
+        isQuizActive = false;
+        localStorage.removeItem('quiz_session_nco_general');
+        renderPauseBanner();
+    }
+}
+
+function pauseAndGoHome() {
+    saveQuizSession();
+    document.getElementById('view-quiz').classList.add('hidden');
+    document.getElementById('view-setup').classList.remove('hidden');
+    renderPauseBanner();
 }
 
 function showQuestion() {
@@ -865,6 +958,7 @@ function showQuestion() {
         }
         ansArea.focus();
     }
+    saveQuizSession();
 }
 
 function submitAnswer() {
@@ -907,6 +1001,7 @@ function submitAnswer() {
     document.getElementById('quiz-answer').disabled = true;
     document.getElementById('btn-submit').classList.add('hidden');
     document.getElementById('btn-next').classList.remove('hidden');
+    saveQuizSession();
 }
 
 function saveCurrentDraft(val) {
@@ -915,6 +1010,7 @@ function saveCurrentDraft(val) {
     } else {
         userAnswers[currentIndex].userAnswer = val;
     }
+    saveQuizSession();
 }
 
 function nextQuestion() {
@@ -925,6 +1021,9 @@ function nextQuestion() {
 
 function showResult() {
     isQuizActive = false;
+    localStorage.removeItem('quiz_session_nco_general');
+    renderPauseBanner();
+
     document.getElementById('view-quiz').classList.add('hidden');
     document.getElementById('view-result').classList.remove('hidden');
 
@@ -941,7 +1040,7 @@ function showResult() {
     document.getElementById('res-detail').innerHTML = `實際作答 <strong>${actualAttempts}</strong> 題 ｜ 答對 <strong>${correctCount}</strong> 題`;
 }
 
-/* 🎴 智慧字卡系統（具備 SRS 智慧演算法與流暢點擊滑動切換） */
+/* 🎴 智慧字卡系統（具備 SRS 智慧演算法） */
 let currentFrontText = "";
 let currentBackText = "";
 
@@ -962,14 +1061,13 @@ function changeCardScope(scope) {
     if (scope === 'all') pool = [...RAW_QUESTIONS];
     else if (scope === 'unmastered') pool = RAW_QUESTIONS.filter(q => !masteredSet.has(q.id));
     else if (scope === 'srs-smart') {
-        // SRS 智慧演算法：將錯題數較多或未熟記的題目優先排在前面
         pool = [...RAW_QUESTIONS].sort((a, b) => {
             const errA = wrongStats[a.id] || 0;
             const errB = wrongStats[b.id] || 0;
             const matA = masteredSet.has(a.id) ? 1 : 0;
             const matB = masteredSet.has(b.id) ? 1 : 0;
-            if (matA !== matB) return matA - matB; // 未熟記優先
-            return errB - errA; // 錯題多的優先
+            if (matA !== matB) return matA - matB;
+            return errB - errA;
         });
     }
     else if (scope === 'easy') pool = RAW_QUESTIONS.filter(q => q.diff === 'easy');
@@ -1095,14 +1193,13 @@ function flipCard() {
     }
 }
 
-// 🧠 SRS 評估按鈕動作
 function rateCard(level) {
     const item = cardList[cardIndex];
     if (level === 'hard') {
         wrongStats[item.id] = (wrongStats[item.id] || 0) + 1;
-        masteredSet.delete(item.id); // 答錯或標記不會，移出熟記名單
+        masteredSet.delete(item.id);
     } else if (level === 'easy') {
-        masteredSet.add(item.id); // 輕鬆掌握，自動列入熟記
+        masteredSet.add(item.id);
     }
     saveAllData();
     nextCard();
@@ -1192,7 +1289,7 @@ function speakText(text) {
     }
 }
 
-/* 👆 字卡區域互動：左側上一題、右側下一題、中間翻面；支援左右滑動 */
+/* 👆 字卡區域互動 */
 const cardEl = document.getElementById('flashcard-card');
 let isDragging = false, startX = 0, startY = 0, currentX = 0, currentY = 0, isMoved = false;
 
@@ -1321,6 +1418,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderDashboard();
     renderStreakBadge();
     handleModeChange();
+    renderPauseBanner();
 
     const bindClick = (id, fn) => {
         const el = document.getElementById(id);
@@ -1335,10 +1433,7 @@ document.addEventListener('DOMContentLoaded', () => {
     bindClick('btn-next', nextQuestion);
     bindClick('btn-prev', () => { if (currentIndex > 0) { currentIndex--; showQuestion(); } });
     bindClick('btn-skip', () => { nextQuestion(); });
-    bindClick('btn-pause-quiz', () => {
-        document.getElementById('view-quiz').classList.add('hidden');
-        document.getElementById('view-setup').classList.remove('hidden');
-    });
+    bindClick('btn-pause-quiz', pauseAndGoHome);
     bindClick('btn-exit-flashcard', exitFlashcards);
     bindClick('btn-card-flip', flipCard);
     bindClick('btn-card-next', nextCard);
@@ -1376,8 +1471,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (confirm("確定要重設所有已熟記標記與錯題嗎？")) {
             masteredSet.clear();
             wrongStats = {};
+            localStorage.removeItem('quiz_session_nco_general');
             saveAllData();
             renderDashboard();
+            renderPauseBanner();
         }
     });
 
