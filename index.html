@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>財務士高班第三階段測驗系統</title>
+    <title>財務士高班第三階段測驗與全功能系統</title>
     <style>
         :root {
             --primary: #1e3a8a;
@@ -20,6 +20,20 @@
             --text-muted: #64748b;
             --border: #cbd5e1;
         }
+        body.dark-mode {
+            --primary: #60a5fa;
+            --primary-hover: #93c5fd;
+            --primary-light: #1e293b;
+            --success: #4ade80;
+            --danger: #f87171;
+            --warning: #fbbf24;
+            --purple: #a78bfa;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -32,15 +46,18 @@
             padding: 1rem;
             user-select: none;
             -webkit-user-select: none;
+            transition: background-color 0.3s, color 0.3s;
         }
         .container {
             background-color: var(--card-bg);
             border-radius: 14px;
-            box-shadow: 0 4px 15px -1px rgba(0,0,0,0.1), 0 2px 6px -2px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 15px -1px rgba(0,0,0,0.1);
             width: 100%;
             max-width: 720px;
             padding: 2rem;
             position: relative;
+            border: 1px solid var(--border);
+            transition: background-color 0.3s, border-color 0.3s;
         }
         h1 { font-size: 1.35rem; color: var(--primary); margin-bottom: 1rem; text-align: center; }
         
@@ -52,7 +69,7 @@
             margin-bottom: 1.25rem;
         }
         .dash-card {
-            background: #f1f5f9;
+            background: var(--primary-light);
             border-radius: 8px;
             padding: 0.6rem 0.4rem;
             text-align: center;
@@ -60,7 +77,7 @@
         }
         .dash-title { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; margin-bottom: 2px; }
         .dash-val { font-size: 1.05rem; font-weight: 800; color: var(--primary); }
-        .dash-bar-bg { background: #e2e8f0; height: 5px; border-radius: 3px; margin-top: 4px; overflow: hidden; }
+        .dash-bar-bg { background: var(--border); height: 5px; border-radius: 3px; margin-top: 4px; overflow: hidden; }
         .dash-bar-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s; }
         
         .setup-group { margin-bottom: 1.15rem; }
@@ -72,8 +89,8 @@
             border-radius: 6px;
             font-size: 0.95rem;
             outline: none;
-            background-color: #fff;
-            transition: border-color 0.2s;
+            background-color: var(--card-bg);
+            color: var(--text);
             user-select: text;
             -webkit-user-select: text;
         }
@@ -116,8 +133,8 @@
             text-decoration: underline;
             cursor: pointer;
             font-size: 0.8rem;
-            padding: 0;
             font-weight: 600;
+            padding: 0;
         }
         
         .status-badge {
@@ -125,11 +142,11 @@
             align-items: center;
             gap: 0.4rem;
             padding: 0.25rem 0.6rem;
-            background-color: #dbeafe;
+            background-color: var(--primary-light);
             color: var(--primary);
             font-size: 0.85rem;
             font-weight: 700;
-            border-radius: 4px;
+            border-radius: 20px;
         }
         .quiz-topbar {
             display: flex;
@@ -171,7 +188,7 @@
         .feedback.correct { background-color: #dcfce7; border: 1px solid #bbf7d0; color: var(--success); }
         .feedback.wrong { background-color: #fee2e2; border: 1px solid #fecaca; color: var(--danger); }
         .feedback-title { font-weight: bold; font-size: 1rem; margin-bottom: 0.4rem; }
-        .diff-view { background: #fff; border: 1px solid var(--border); padding: 0.75rem; border-radius: 4px; margin-top: 0.5rem; font-size: 0.92rem; line-height: 1.6; word-break: break-all; }
+        .diff-view { background: var(--card-bg); border: 1px solid var(--border); padding: 0.75rem; border-radius: 4px; margin-top: 0.5rem; font-size: 0.92rem; line-height: 1.6; word-break: break-all; }
         
         /* 🎴 3D 翻轉字卡樣式 */
         .card-stage {
@@ -212,10 +229,10 @@
             justify-content: space-between;
             box-sizing: border-box;
             border: 2px solid var(--border);
-            background-color: #ffffff;
+            background-color: var(--card-bg);
         }
         .flashcard-front { border-color: #93c5fd; }
-        .flashcard-back { transform: rotateY(180deg); border-color: #86efac; background-color: #f8fafc; }
+        .flashcard-back { transform: rotateY(180deg); border-color: #86efac; background-color: var(--primary-light); }
         .flashcard-side-label { font-size: 0.8rem; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
         .flashcard-body {
             flex-grow: 1; display: flex; align-items: center; justify-content: center; text-align: left;
@@ -231,24 +248,22 @@
         .cloze-blank.revealed { background-color: #fef08a; color: #854d0e; font-weight: bold; box-shadow: inset 0 0 0 1px #eab308; }
 
         .ergonomic-bar {
-            display: flex; align-items: center; justify-content: space-between; background: #ffffff;
+            display: flex; align-items: center; justify-content: space-between; background: var(--card-bg);
             border: 1.5px solid var(--border); padding: 0.45rem 0.6rem; border-radius: 40px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); margin-top: 0.35rem;
         }
         .ergo-btn-circle {
-            width: 46px; height: 46px; border-radius: 50%; border: none; background: #f1f5f9; color: #334155;
+            width: 46px; height: 46px; border-radius: 50%; border: none; background: var(--primary-light); color: var(--text);
             display: flex; justify-content: center; align-items: center; cursor: pointer; transition: all 0.15s; flex-shrink: 0;
         }
         .ergo-btn-circle:active { transform: scale(0.9); }
-        .ergo-btn-circle:hover { background: #e2e8f0; color: #0f172a; }
-        .ergo-btn-circle:disabled { background: #f8fafc; color: #cbd5e1; cursor: not-allowed; }
-        
+        .ergo-btn-circle:disabled { opacity: 0.4; cursor: not-allowed; }
         .ergo-btn-center {
             flex-grow: 1; margin: 0 0.5rem; height: 46px; border-radius: 25px; border: none;
             background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%); color: #fff; font-size: 0.95rem; font-weight: 700;
             display: flex; justify-content: center; align-items: center; gap: 0.35rem; cursor: pointer; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
         }
         .ergo-btn-autoplay {
-            height: 46px; padding: 0 0.9rem; border-radius: 25px; border: 1.5px solid var(--border); background: #fff;
+            height: 46px; padding: 0 0.9rem; border-radius: 25px; border: 1.5px solid var(--border); background: var(--card-bg);
             color: var(--text-muted); font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; gap: 0.3rem; cursor: pointer; flex-shrink: 0;
         }
         .ergo-btn-autoplay.active { background: #fef3c7; border-color: #f59e0b; color: #b45309; }
@@ -260,19 +275,19 @@
         
         .filter-tabs { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }
         .filter-tab {
-            padding: 0.35rem 0.8rem; border-radius: 20px; border: 1px solid var(--border); background: #fff;
+            padding: 0.35rem 0.8rem; border-radius: 20px; border: 1px solid var(--border); background: var(--card-bg);
             font-size: 0.85rem; cursor: pointer; color: var(--text-muted); font-weight: 600;
         }
         .filter-tab.active { background-color: var(--primary); color: #fff; border-color: var(--primary); }
         .mastered-list { max-height: 55vh; overflow-y: auto; margin: 0.5rem 0 1rem 0; display: flex; flex-direction: column; gap: 0.75rem; }
-        .mastered-item-card { border: 1px solid var(--border); border-radius: 10px; padding: 0.9rem; background: #fff; }
-        .mastered-item-card.is-mastered { border-color: #93c5fd; background-color: #f8fafc; }
+        .mastered-item-card { border: 1px solid var(--border); border-radius: 10px; padding: 0.9rem; background: var(--card-bg); }
+        .mastered-item-card.is-mastered { border-color: #93c5fd; background-color: var(--primary-light); }
         
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 9999; padding: 1.5rem;
         }
-        .modal-card { background: #ffffff; border-radius: 16px; max-width: 500px; width: 100%; padding: 2rem; text-align: center; }
+        .modal-card { background: var(--card-bg); border-radius: 16px; max-width: 500px; width: 100%; padding: 2rem; text-align: center; color: var(--text); }
         .hidden { display: none !important; }
         
         @media print {
@@ -290,9 +305,10 @@
     <!-- 主頁（設定與總覽） -->
     <div id="view-setup">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <button class="btn-text-sm" onclick="toggleDarkMode()">🌓 切換夜間護眼模式</button>
             <div style="font-size: 0.8rem; color: var(--text-muted);" id="study-streak-badge">🔥 連續學習 0 天</div>
         </div>
-        <h1>財務士高班第三階段測驗系統</h1>
+        <h1>財務士高班第三階段測驗與全功能系統</h1>
         
         <!-- 掌握度儀表板 -->
         <div class="dashboard-grid">
@@ -447,7 +463,7 @@
     <div id="view-flashcard" class="hidden">
         <div class="quiz-topbar">
             <!-- 🎴 字卡專屬題庫範圍下拉選單 -->
-            <select id="select-card-scope" onchange="changeCardScope(this.value)" style="width:auto; padding:0.3rem 0.6rem; font-size:0.85rem; font-weight:700; border-radius:20px; border-color:#c7d2fe; background:#ede9fe; color:#4338ca; outline:none; cursor:pointer;">
+            <select id="select-card-scope" onchange="changeCardScope(this.value)" style="width:auto; padding:0.3rem 0.6rem; font-size:0.85rem; font-weight:700; border-radius:20px; border-color:#c7d2fe; background:var(--primary-light); color:var(--primary); outline:none; cursor:pointer;">
                 <option value="unmastered" selected>📚 僅未熟記題庫</option>
                 <option value="all">🌐 全部總題庫 (90題)</option>
                 <option value="wrong">🔥 常錯題庫</option>
@@ -715,6 +731,15 @@ function updateStudyStreak() {
     }
     const badge = document.getElementById('study-streak-badge');
     if (badge) badge.textContent = `🔥 連續學習 ${streakData.days} 天`;
+}
+
+function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+    localStorage.setItem('dark_mode_enabled', document.body.classList.contains('dark-mode'));
+}
+
+if (localStorage.getItem('dark_mode_enabled') === 'true') {
+    document.body.classList.add('dark-mode');
 }
 
 function renderDashboard() {
@@ -1283,12 +1308,9 @@ function renderCardContent() {
     cardLastPositions[currentCardScope] = cardIndex;
     localStorage.setItem('card_last_positions_stage3', JSON.stringify(cardLastPositions));
 
-    const card = document.getElementById('flashcard-card');
     const inner = document.getElementById('flashcard-inner');
-    card.style.transition = 'none';
-    card.style.transform = 'translate(0px, 0px) rotate(0deg)';
-    card.style.opacity = '1';
     inner.classList.remove('is-flipped');
+    document.getElementById('srs-box').classList.add('hidden');
     document.getElementById('btn-toggle-reveal').textContent = "全部揭曉";
 
     document.getElementById('card-progress').textContent = `📝 題目 (${cardIndex + 1}/${cardList.length}) (#${item.id})`;
@@ -1322,11 +1344,6 @@ function renderCardContent() {
 
 // 💡 完美防雙翻防抖機制
 function flipCard() {
-    if (isAnimating) return;
-    const now = Date.now();
-    if (now < suppressClickUntil) return;
-    suppressClickUntil = now + 250;
-
     isCardFlipped = !isCardFlipped;
     const inner = document.getElementById('flashcard-inner');
     if (isCardFlipped) {
@@ -1362,49 +1379,17 @@ function rateCard(level) {
     nextCard();
 }
 
-function animateSlideTo(direction, onComplete) {
-    isAnimating = true;
-    const card = document.getElementById('flashcard-card');
-    const destX = (direction === 'left') ? -window.innerWidth * 1.1 : window.innerWidth * 1.1;
-    const rotate = (direction === 'left') ? -18 : 18;
-
-    card.style.transition = 'transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.25s ease';
-    card.style.transform = `translate(${destX}px, 20px) rotate(${rotate}deg)`;
-    card.style.opacity = '0';
-
-    setTimeout(() => {
-        onComplete();
-        const startX = (direction === 'left') ? window.innerWidth * 0.9 : -window.innerWidth * 0.9;
-        card.style.transition = 'none';
-        card.style.transform = `translate(${startX}px, 0px) rotate(${(direction === 'left') ? 8 : -8}deg)`;
-        card.style.opacity = '0';
-
-        requestAnimationFrame(() => {
-            card.style.transition = 'transform 0.32s cubic-bezier(0.18, 0.89, 0.32, 1.15), opacity 0.28s ease';
-            card.style.transform = 'translate(0px, 0px) rotate(0deg)';
-            card.style.opacity = '1';
-            setTimeout(() => { isAnimating = false; }, 320);
-        });
-    }, 260);
-}
-
 function prevCard() {
-    if (isAnimating || cardIndex <= 0) return;
-    document.getElementById('srs-box').classList.add('hidden');
-    animateSlideTo('right', () => {
+    if (cardIndex > 0) {
         cardIndex--;
         renderCardContent();
-    });
+    }
 }
 
 function nextCard() {
-    if (isAnimating) return;
     if (cardIndex < cardList.length - 1) {
-        document.getElementById('srs-box').classList.add('hidden');
-        animateSlideTo('left', () => {
-            cardIndex++;
-            renderCardContent();
-        });
+        cardIndex++;
+        renderCardContent();
     } else {
         alert("🎉 本題庫字卡已全部背誦完畢！");
         exitFlashcards();
@@ -1469,110 +1454,6 @@ function speakText(text) {
         alert("您的瀏覽器不支援語音朗讀功能！");
     }
 }
-
-/* ========================================================
-   👆 真實物理跟手拖曳滑動
-   ======================================================== */
-const cardEl = document.getElementById('flashcard-card');
-let isDragging = false;
-let startX = 0;
-let startY = 0;
-let currentX = 0;
-let currentY = 0;
-let isMovedSignificantly = false;
-
-function onDragStart(clientX, clientY) {
-    if (isAnimating) return;
-    isDragging = true;
-    isMovedSignificantly = false;
-    startX = clientX;
-    startY = clientY;
-    currentX = clientX;
-    currentY = clientY;
-    cardEl.style.transition = 'none';
-}
-
-function onDragMove(clientX, clientY) {
-    if (!isDragging || isAnimating) return;
-    currentX = clientX;
-    currentY = clientY;
-    const deltaX = currentX - startX;
-    const deltaY = currentY - startY;
-
-    if (Math.abs(deltaX) > 10 || Math.abs(deltaY) > 10) {
-        isMovedSignificantly = true;
-    }
-
-    const rotation = deltaX * 0.05;
-    cardEl.style.transform = `translate(${deltaX}px, ${deltaY * 0.25}px) rotate(${rotation}deg)`;
-    cardEl.style.opacity = Math.max(0.4, 1 - Math.abs(deltaX) / (window.innerWidth * 0.9));
-}
-
-function onDragEnd() {
-    if (!isDragging || isAnimating) return;
-    isDragging = false;
-    const deltaX = currentX - startX;
-    const deltaY = currentY - startY;
-
-    if (Math.abs(deltaX) > 80 && Math.abs(deltaX) > Math.abs(deltaY) * 1.15) {
-        suppressClickUntil = Date.now() + 350;
-        document.getElementById('srs-box').classList.add('hidden');
-        if (deltaX < 0) {
-            if (cardIndex < cardList.length - 1) {
-                animateSlideTo('left', () => { cardIndex++; renderCardContent(); });
-            } else {
-                alert("🎉 本題庫字卡已全部背誦完畢！");
-                exitFlashcards();
-            }
-        } else {
-            if (cardIndex > 0) {
-                animateSlideTo('right', () => { cardIndex--; renderCardContent(); });
-            } else {
-                springBack();
-            }
-        }
-    } else {
-        if (!isMovedSignificantly) {
-            flipCard();
-        } else {
-            springBack();
-        }
-    }
-}
-
-function springBack() {
-    cardEl.style.transition = 'transform 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.25), opacity 0.25s ease';
-    cardEl.style.transform = 'translate(0px, 0px) rotate(0deg)';
-    cardEl.style.opacity = '1';
-}
-
-cardEl.addEventListener('touchstart', (e) => {
-    if (e.target.classList.contains('cloze-blank') || e.target.closest('button')) return;
-    onDragStart(e.touches[0].clientX, e.touches[0].clientY);
-}, { passive: true });
-
-cardEl.addEventListener('touchmove', (e) => {
-    if (!isDragging) return;
-    onDragMove(e.touches[0].clientX, e.touches[0].clientY);
-}, { passive: true });
-
-cardEl.addEventListener('touchend', (e) => {
-    if (!isDragging) return;
-    onDragEnd();
-});
-
-cardEl.addEventListener('mousedown', (e) => {
-    if (e.target.classList.contains('cloze-blank') || e.target.closest('button')) return;
-    onDragStart(e.clientX, e.clientY);
-});
-
-window.addEventListener('mousemove', (e) => {
-    if (isDragging) onDragMove(e.clientX, e.clientY);
-});
-
-window.addEventListener('mouseup', () => {
-    if (isDragging) onDragEnd();
-});
 
 /* ========================================================
    📖 總題庫瀏覽與管理清單
