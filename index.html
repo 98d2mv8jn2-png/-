@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>財務士高班第三階段測驗系統</title>
+    <title>財務士高班第三階段測驗與全功能衝刺系統</title>
     <style>
         :root {
             --primary: #1e3a8a;
@@ -20,6 +20,20 @@
             --text-muted: #64748b;
             --border: #e2e8f0;
         }
+        body.dark-mode {
+            --primary: #60a5fa;
+            --primary-hover: #93c5fd;
+            --primary-light: #1e293b;
+            --success: #4ade80;
+            --danger: #f87171;
+            --warning: #fbbf24;
+            --purple: #a78bfa;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -32,35 +46,38 @@
             padding: 1rem;
             user-select: none;
             -webkit-user-select: none;
+            transition: background-color 0.3s, color 0.3s;
         }
         .container {
             background-color: var(--card-bg);
             border-radius: 20px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
             width: 100%;
-            max-width: 700px;
+            max-width: 720px;
             padding: 2rem;
             position: relative;
             overflow: hidden;
+            border: 1px solid var(--border);
         }
-        h1 { font-size: 1.35rem; color: var(--primary); margin-bottom: 1.25rem; text-align: center; font-weight: 800; letter-spacing: -0.5px; }
+        h1 { font-size: 1.35rem; color: var(--primary); margin-bottom: 1rem; text-align: center; font-weight: 800; }
         
+        /* 📊 進度儀表板 */
         .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 0.5rem;
-            margin-bottom: 1.25rem;
+            margin-bottom: 1.15rem;
         }
         .dash-card {
-            background: #f8fafc;
+            background: var(--primary-light);
             border-radius: 12px;
             padding: 0.65rem 0.4rem;
             text-align: center;
             border: 1px solid var(--border);
         }
-        .dash-title { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; margin-bottom: 2px; }
+        .dash-title { font-size: 0.72rem; color: var(--text-muted); font-weight: 600; margin-bottom: 2px; }
         .dash-val { font-size: 1.05rem; font-weight: 800; color: var(--primary); }
-        .dash-bar-bg { background: #e2e8f0; height: 5px; border-radius: 3px; margin-top: 5px; overflow: hidden; }
+        .dash-bar-bg { background: var(--border); height: 5px; border-radius: 3px; margin-top: 5px; overflow: hidden; }
         .dash-bar-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s; }
         
         .setup-group { margin-bottom: 1.15rem; }
@@ -72,14 +89,10 @@
             border-radius: 10px;
             font-size: 0.95rem;
             outline: none;
-            background-color: #fff;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            background-color: var(--card-bg);
+            color: var(--text);
             user-select: text;
             -webkit-user-select: text;
-        }
-        select:focus, input[type="number"]:focus, textarea:focus { 
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
         }
         textarea { resize: vertical; min-height: 110px; font-family: inherit; }
         .grid-inputs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; margin-top: 0.5rem; }
@@ -89,277 +102,99 @@
         .total-hint { font-size: 0.85rem; color: var(--primary); font-weight: 600; margin-top: 0.4rem; text-align: right; }
         
         .btn {
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            gap: 0.4rem;
-            width: 100%;
-            padding: 0.8rem 1.25rem;
-            background-color: var(--primary);
-            color: #fff;
-            border: none;
-            border-radius: 10px;
-            font-size: 0.95rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
+            display: inline-flex; justify-content: center; align-items: center; gap: 0.4rem;
+            width: 100%; padding: 0.8rem 1.25rem; background-color: var(--primary); color: #fff;
+            border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
         }
         .btn:active { transform: scale(0.97); }
-        .btn:hover { background-color: var(--primary-hover); }
-        .btn:disabled { background-color: #e2e8f0; color: #94a3b8; cursor: not-allowed; }
-        .btn-warning { background-color: var(--warning); }
-        .btn-warning:hover { background-color: #b45309; }
-        .btn-secondary { background-color: #64748b; }
-        .btn-secondary:hover { background-color: #475569; }
-        .btn-success { background-color: var(--success); }
-        .btn-success:hover { background-color: #166534; }
-        .btn-purple { background-color: var(--purple); }
-        .btn-purple:hover { background-color: var(--purple-hover); }
-        .btn-skip { background-color: #f1f5f9; color: #334155; border: 1.5px solid var(--border); }
-        .btn-skip:hover { background-color: #e2e8f0; }
-        
+        .btn-warning { background-color: var(--warning); color: #fff; }
+        .btn-secondary { background-color: var(--text-muted); color: #fff; }
+        .btn-success { background-color: var(--success); color: #fff; }
+        .btn-purple { background-color: var(--purple); color: #fff; }
         .btn-text-sm {
-            background: none;
-            border: none;
-            color: #0284c7;
-            text-decoration: underline;
-            cursor: pointer;
-            font-size: 0.82rem;
-            padding: 0;
-            font-weight: 600;
+            background: none; border: none; color: #0284c7; text-decoration: underline; cursor: pointer; font-size: 0.82rem; font-weight: 600; padding: 0;
         }
-        .btn-text-sm:hover { color: #0369a1; }
         
         .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            padding: 0.3rem 0.75rem;
-            background-color: var(--primary-light);
-            color: var(--primary);
-            font-size: 0.85rem;
-            font-weight: 700;
-            border-radius: 20px;
+            display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.75rem;
+            background-color: var(--primary-light); color: var(--primary); font-size: 0.85rem; font-weight: 700; border-radius: 20px;
         }
         .quiz-topbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.85rem;
-            flex-wrap: wrap;
-            gap: 0.5rem;
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; flex-wrap: wrap; gap: 0.5rem;
         }
         .quiz-topbar-right { display: flex; align-items: center; gap: 0.75rem; }
         .mastered-toggle {
-            display: flex;
-            align-items: center;
-            gap: 0.45rem;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            cursor: pointer;
-            user-select: none;
-            font-weight: 600;
+            display: flex; align-items: center; gap: 0.45rem; font-size: 0.85rem; color: var(--text-muted); cursor: pointer; user-select: none; font-weight: 600;
         }
         .mastered-toggle input { cursor: pointer; width: 17px; height: 17px; accent-color: var(--primary); }
         
         .pause-banner {
-            background-color: #fef3c7;
-            border: 1px solid #fde68a;
-            border-radius: 12px;
-            padding: 0.85rem 1.1rem;
-            margin-bottom: 1.25rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
+            background-color: #fef3c7; border: 1px solid #fde68a; border-radius: 12px; padding: 0.85rem 1.1rem; margin-bottom: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; color: #78350f;
         }
-        .pause-title { font-weight: bold; color: #92400e; font-size: 0.9rem; }
-        .pause-desc { font-size: 0.82rem; color: #78350f; }
+        .pause-title { font-weight: bold; font-size: 0.9rem; }
+        .pause-desc { font-size: 0.82rem; }
         .pause-btns { display: flex; gap: 0.5rem; }
         
-        .question-box { font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; line-height: 1.6; color: #1e293b; }
+        .question-box { font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; line-height: 1.6; }
         .feedback { margin-top: 1rem; padding: 1.1rem; border-radius: 10px; }
         .feedback.correct { background-color: #dcfce7; border: 1px solid #bbf7d0; color: var(--success); }
         .feedback.wrong { background-color: #fee2e2; border: 1px solid #fecaca; color: var(--danger); }
         .feedback-title { font-weight: bold; font-size: 1rem; margin-bottom: 0.4rem; }
-        .diff-view { background: #fff; border: 1px solid var(--border); padding: 0.75rem; border-radius: 6px; margin-top: 0.5rem; font-size: 0.92rem; line-height: 1.6; color: var(--text); word-break: break-all; }
-        .diff-del { background-color: #fecaca; color: #991b1b; text-decoration: line-through; padding: 0 2px; border-radius: 2px; }
-        .diff-ins { background-color: #fed7aa; color: #9a3412; font-weight: bold; padding: 0 2px; border-radius: 2px; }
+        .diff-view { background: var(--card-bg); border: 1px solid var(--border); padding: 0.75rem; border-radius: 6px; margin-top: 0.5rem; font-size: 0.92rem; line-height: 1.6; word-break: break-all; }
         
-        .stat-card { background-color: #f8fafc; border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; margin-bottom: 1.25rem; text-align: center; }
-        .stat-rate { font-size: 2.5rem; font-weight: 800; color: var(--primary); margin: 0.4rem 0; }
-        
-        /* ========================================================
-           🎴 真實物理跟手拖曳 3D 字卡
-           ======================================================== */
+        /* 🎴 3D 物理拖曳字卡 */
         .card-stage {
-            position: relative;
-            width: 100%;
-            height: 350px;
-            margin: 0.5rem 0 1.15rem 0;
-            perspective: 1200px;
-            touch-action: pan-y;
+            position: relative; width: 100%; height: 350px; margin: 0.5rem 0 1.15rem 0; perspective: 1200px; touch-action: pan-y;
         }
         .flashcard {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            transform-style: preserve-3d;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
-            cursor: grab;
-            will-change: transform, opacity;
+            width: 100%; height: 100%; position: relative; transform-style: preserve-3d; border-radius: 16px;
+            box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.08); cursor: grab; will-change: transform, opacity;
         }
         .flashcard:active { cursor: grabbing; }
-        
         .flashcard-inner {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            transform-style: preserve-3d;
-            transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
-            border-radius: 16px;
+            width: 100%; height: 100%; position: relative; transform-style: preserve-3d;
+            transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px;
         }
         .flashcard-inner.is-flipped { transform: rotateY(180deg); }
-
         .flashcard-face {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
-            -webkit-backface-visibility: hidden;
-            border-radius: 16px;
-            padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            box-sizing: border-box;
-            border: 2px solid transparent;
+            position: absolute; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden;
+            border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; border: 2px solid var(--border);
+            background-color: var(--card-bg);
         }
-        .flashcard-front {
-            background-color: #ffffff;
-            border-color: #bfdbfe;
-        }
-        .flashcard-back {
-            background-color: #f8fafc;
-            transform: rotateY(180deg);
-            border-color: #bbf7d0;
-        }
-        .flashcard-side-label {
-            font-size: 0.8rem;
-            font-weight: 700;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .flashcard-front .flashcard-side-label { color: #2563eb; }
-        .flashcard-back .flashcard-side-label { color: #16a34a; }
+        .flashcard-side-label { font-size: 0.8rem; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
         .flashcard-body {
-            flex-grow: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: left;
-            font-size: 1.05rem;
-            line-height: 1.65;
-            font-weight: 600;
-            overflow-y: auto;
-            padding: 0.5rem 0;
-            word-break: break-word;
-            user-select: text;
-            -webkit-user-select: text;
+            flex-grow: 1; display: flex; align-items: center; justify-content: center; text-align: left;
+            font-size: 1.05rem; line-height: 1.65; font-weight: 600; overflow-y: auto; padding: 0.5rem 0; word-break: break-word; user-select: text; -webkit-user-select: text;
         }
         .flashcard-hint { font-size: 0.78rem; color: var(--text-muted); text-align: center; user-select: none; }
         
         .cloze-blank {
-            background-color: #1e293b;
-            color: transparent;
-            border-radius: 4px;
-            padding: 1px 6px;
-            margin: 0 2px;
-            cursor: pointer;
-            transition: all 0.2s;
-            user-select: none;
-            display: inline-block;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+            background-color: #334155; color: transparent; border-radius: 4px; padding: 1px 6px; margin: 0 2px;
+            cursor: pointer; transition: all 0.2s; user-select: none; display: inline-block; box-shadow: 0 1px 3px rgba(0,0,0,0.15);
         }
         .cloze-blank:hover { filter: brightness(1.25); }
-        .cloze-blank.revealed {
-            background-color: #fef08a;
-            color: #854d0e;
-            font-weight: bold;
-            box-shadow: inset 0 0 0 1px #eab308;
-        }
+        .cloze-blank.revealed { background-color: #fef08a; color: #854d0e; font-weight: bold; box-shadow: inset 0 0 0 1px #eab308; }
 
         .ergonomic-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #ffffff;
-            border: 1.5px solid var(--border);
-            padding: 0.45rem 0.6rem;
-            border-radius: 40px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
-            margin-top: 0.35rem;
+            display: flex; align-items: center; justify-content: space-between; background: var(--card-bg);
+            border: 1.5px solid var(--border); padding: 0.45rem 0.6rem; border-radius: 40px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); margin-top: 0.35rem;
         }
         .ergo-btn-circle {
-            width: 46px;
-            height: 46px;
-            border-radius: 50%;
-            border: none;
-            background: #f1f5f9;
-            color: #334155;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.15s;
-            flex-shrink: 0;
+            width: 46px; height: 46px; border-radius: 50%; border: none; background: var(--primary-light); color: var(--text);
+            display: flex; justify-content: center; align-items: center; cursor: pointer; transition: all 0.15s; flex-shrink: 0;
         }
         .ergo-btn-circle:active { transform: scale(0.9); }
-        .ergo-btn-circle:hover { background: #e2e8f0; color: #0f172a; }
-        .ergo-btn-circle:disabled { background: #f8fafc; color: #cbd5e1; cursor: not-allowed; }
-        
+        .ergo-btn-circle:disabled { opacity: 0.4; cursor: not-allowed; }
         .ergo-btn-center {
-            flex-grow: 1;
-            margin: 0 0.5rem;
-            height: 46px;
-            border-radius: 25px;
-            border: none;
-            background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
-            color: #fff;
-            font-size: 0.95rem;
-            font-weight: 700;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 0.35rem;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
-            transition: all 0.15s;
+            flex-grow: 1; margin: 0 0.5rem; height: 46px; border-radius: 25px; border: none;
+            background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%); color: #fff; font-size: 0.95rem; font-weight: 700;
+            display: flex; justify-content: center; align-items: center; gap: 0.35rem; cursor: pointer; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
         }
-        .ergo-btn-center:active { transform: scale(0.96); }
-        
         .ergo-btn-autoplay {
-            height: 46px;
-            padding: 0 0.9rem;
-            border-radius: 25px;
-            border: 1.5px solid var(--border);
-            background: #fff;
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-            cursor: pointer;
-            transition: all 0.15s;
-            flex-shrink: 0;
+            height: 46px; padding: 0 0.9rem; border-radius: 25px; border: 1.5px solid var(--border); background: var(--card-bg);
+            color: var(--text-muted); font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; gap: 0.3rem; cursor: pointer; flex-shrink: 0;
         }
-        .ergo-btn-autoplay.active {
-            background: #fef3c7;
-            border-color: #f59e0b;
-            color: #b45309;
-        }
+        .ergo-btn-autoplay.active { background: #fef3c7; border-color: #f59e0b; color: #b45309; }
 
         .diff-tag { font-size: 0.75rem; padding: 2px 7px; border-radius: 6px; font-weight: 700; }
         .diff-tag-easy { background-color: #dcfce7; color: #166534; }
@@ -368,28 +203,19 @@
         
         .filter-tabs { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }
         .filter-tab {
-            padding: 0.35rem 0.8rem;
-            border-radius: 20px;
-            border: 1px solid var(--border);
-            background: #fff;
-            font-size: 0.85rem;
-            cursor: pointer;
-            color: var(--text-muted);
-            font-weight: 600;
+            padding: 0.35rem 0.8rem; border-radius: 20px; border: 1px solid var(--border); background: var(--card-bg);
+            font-size: 0.85rem; cursor: pointer; color: var(--text-muted); font-weight: 600;
         }
         .filter-tab.active { background-color: var(--primary); color: #fff; border-color: var(--primary); }
         .mastered-list { max-height: 55vh; overflow-y: auto; margin: 0.5rem 0 1rem 0; display: flex; flex-direction: column; gap: 0.75rem; }
-        .mastered-item-card { border: 1px solid var(--border); border-radius: 10px; padding: 0.9rem; background: #fff; }
-        .mastered-item-card.is-mastered { border-color: #93c5fd; background-color: #f8fafc; }
+        .mastered-item-card { border: 1px solid var(--border); border-radius: 10px; padding: 0.9rem; background: var(--card-bg); }
+        .mastered-item-card.is-mastered { border-color: #93c5fd; background-color: var(--primary-light); }
         
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px);
-            display: flex; justify-content: center; align-items: center; z-index: 9999; padding: 1.5rem;
+            background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 9999; padding: 1.5rem;
         }
-        .modal-card {
-            background: #ffffff; border-radius: 16px; max-width: 500px; width: 100%; padding: 2rem; text-align: center;
-        }
+        .modal-card { background: var(--card-bg); border-radius: 16px; max-width: 500px; width: 100%; padding: 2rem; text-align: center; color: var(--text); }
         .hidden { display: none !important; }
         
         @media print {
@@ -406,7 +232,11 @@
 <div class="container">
     <!-- 主頁（設定與總覽） -->
     <div id="view-setup">
-        <h1>財務士高班第三階段測驗與智慧字卡系統</h1>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <button class="btn-text-sm" onclick="toggleDarkMode()" style="font-size:0.85rem;">🌓 切換夜間護眼模式</button>
+            <div style="font-size: 0.8rem; color: var(--text-muted);" id="study-streak-badge">🔥 連續學習 0 天</div>
+        </div>
+        <h1>財務士高班第三階段測驗與全功能系統</h1>
         
         <!-- 掌握度儀表板 -->
         <div class="dashboard-grid">
@@ -499,14 +329,14 @@
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 1.25rem;">
             <button class="btn" onclick="startNewQuizClick()">✍️ 開始打字測驗</button>
-            <button class="btn btn-purple" onclick="openFlashcardSetup()">🎴 進入字卡背誦</button>
+            <button class="btn btn-purple" onclick="openFlashcardSetup()">🎴 進入智慧字卡</button>
         </div>
 
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; font-size: 0.85rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--border); font-size: 0.85rem;">
             <button class="btn-text-sm" onclick="showMasteredList()">📖 總題庫瀏覽 / 列印</button>
             <div>
-                <button class="btn-text-sm" onclick="showBackupModal()">💾 進度備份/同步</button>
-                <span style="color: #cbd5e1; margin: 0 4px;">|</span>
+                <button class="btn-text-sm" onclick="showBackupModal()">💾 進度備份</button>
+                <span style="color: var(--border); margin: 0 4px;">|</span>
                 <button class="btn-text-sm" style="color: var(--danger);" onclick="resetAllData()">⚠️ 清空資料</button>
             </div>
         </div>
@@ -534,12 +364,12 @@
             <div class="status-badge" id="quiz-progress">第 1 題 / 共 30 題</div>
             <div id="quiz-timer" class="status-badge hidden" style="background:#fee2e2; color:#991b1b;">⏱️ 45:00</div>
             <div class="quiz-topbar-right">
-                <button class="btn-text-sm" onclick="giveHint()" id="btn-hint" style="font-weight:bold; color:#d97706;">💡 提示要點</button>
+                <button class="btn-text-sm" onclick="giveHint()" id="btn-hint" style="font-weight:bold; color:var(--warning);">💡 提示</button>
                 <label class="mastered-toggle">
                     <input type="checkbox" id="chk-mastered" onchange="toggleMastered(this.checked)">
-                    <span>已熟記</span>
+                    <span>熟記</span>
                 </label>
-                <button class="btn-text-sm" onclick="pauseAndGoHome()" style="font-weight:600; color:#475569;">⏸️ 暫停</button>
+                <button class="btn-text-sm" onclick="pauseAndGoHome()" style="font-weight:600; color:var(--text-muted);">⏸️ 暫停</button>
             </div>
         </div>
         
@@ -557,11 +387,11 @@
         <div id="quiz-feedback" class="feedback hidden"></div>
     </div>
 
-    <!-- 🎴 智慧字卡背誦畫面（跟手拖曳滑動 + 獨立範圍選擇） -->
+    <!-- 🎴 智慧字卡背誦畫面（完整記憶上次進度 + 正反對調 + SRS + 題號排序） -->
     <div id="view-flashcard" class="hidden">
         <div class="quiz-topbar">
             <!-- 🎴 字卡專屬題庫範圍下拉選單 -->
-            <select id="select-card-scope" onchange="changeCardScope(this.value)" style="width:auto; padding:0.3rem 0.6rem; font-size:0.85rem; font-weight:700; border-radius:20px; border-color:#c7d2fe; background:#ede9fe; color:#4338ca;">
+            <select id="select-card-scope" onchange="changeCardScope(this.value)" style="width:auto; padding:0.3rem 0.6rem; font-size:0.85rem; font-weight:700; border-radius:20px; border-color:#c7d2fe; background:var(--primary-light); color:var(--primary); outline:none; cursor:pointer;">
                 <option value="unmastered" selected>📚 僅未熟記題庫</option>
                 <option value="all">🌐 全部總題庫 (90題)</option>
                 <option value="wrong">🔥 常錯題庫</option>
@@ -571,15 +401,15 @@
             </select>
             
             <div class="quiz-topbar-right">
+                <label class="mastered-toggle" title="正反題面互換訓練">
+                    <input type="checkbox" id="chk-reverse" onchange="toggleReverseMode(this.checked)">
+                    <span>🔄 反向</span>
+                </label>
                 <label class="mastered-toggle" title="智慧挖空核心關鍵詞">
                     <input type="checkbox" id="chk-cloze" onchange="toggleClozeMode(this.checked)">
                     <span>🧠 挖空</span>
                 </label>
-                <label class="mastered-toggle">
-                    <input type="checkbox" id="chk-card-mastered" onchange="toggleCardMastered(this.checked)">
-                    <span>已熟記</span>
-                </label>
-                <button class="btn-text-sm" onclick="exitFlashcards()" style="font-weight:700; color:#475569;">🏠 主頁</button>
+                <button class="btn-text-sm" onclick="exitFlashcards()" style="font-weight:700; color:var(--text-muted);">🏠 主頁</button>
             </div>
         </div>
 
@@ -592,30 +422,37 @@
                         <div class="flashcard-side-label">
                             <span id="card-progress">📝 題目 (1/90)</span>
                             <div style="display:flex; gap:0.4rem; align-items:center;">
-                                <button class="btn-text-sm" onclick="event.stopPropagation(); speakText(cardList[cardIndex].q);" title="語音朗讀">🔊 朗讀</button>
+                                <button class="btn-text-sm" onclick="event.stopPropagation(); speakText(currentFrontText);" title="語音朗讀">🔊 朗讀</button>
                                 <span id="card-diff-tag" class="diff-tag diff-tag-easy">易</span>
                             </div>
                         </div>
-                        <div class="flashcard-body" id="card-q-text"></div>
-                        <div class="flashcard-hint">👆 點擊翻面 ｜ 👈 水平滑動切換 👉</div>
+                        <div class="flashcard-body" id="card-front-body"></div>
+                        <div class="flashcard-hint" id="card-front-hint">👆 點擊翻面 ｜ 👈 左右滑動切換 👉</div>
                     </div>
                     <!-- 背面 -->
                     <div class="flashcard-face flashcard-back">
                         <div class="flashcard-side-label">
-                            <span>💡 標準答案</span>
+                            <span id="card-back-title">💡 標準答案</span>
                             <div style="display:flex; gap:0.5rem; align-items:center;">
                                 <button class="btn-text-sm" id="btn-toggle-reveal" onclick="event.stopPropagation(); toggleAllBlanks();" style="color:#0284c7;">全部揭曉</button>
-                                <button class="btn-text-sm" onclick="event.stopPropagation(); speakText(cardList[cardIndex].a);" style="color:#166534;" title="語音朗讀">🔊 朗讀</button>
+                                <button class="btn-text-sm" onclick="event.stopPropagation(); speakText(currentBackText);" style="color:var(--success);" title="語音朗讀">🔊 朗讀</button>
                             </div>
                         </div>
-                        <div class="flashcard-body" id="card-a-text" style="font-weight:500;"></div>
-                        <div class="flashcard-hint">👆 點擊翻回正面 ｜ 👈 水平滑動切換 👉</div>
+                        <div class="flashcard-body" id="card-back-body" style="font-weight:500;"></div>
+                        <div class="flashcard-hint">👆 點擊翻回正面 ｜ 👈 左右滑動切換 👉</div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 🎛️ 人體工學底部操控懸浮吧 -->
+        <!-- 🧠 SRS 間距重複自我評估按鈕 -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; margin-bottom: 0.5rem;" id="srs-box" class="hidden">
+            <button class="btn btn-danger" style="padding:0.5rem; font-size:0.85rem;" onclick="rateCard('hard')">🔴 不會 (重來)</button>
+            <button class="btn btn-warning" style="padding:0.5rem; font-size:0.85rem;" onclick="rateCard('mid')">🟡 模糊</button>
+            <button class="btn btn-success" style="padding:0.5rem; font-size:0.85rem;" onclick="rateCard('easy')">🟢 輕鬆 (熟記)</button>
+        </div>
+
+        <!-- 🎛️ 人體工學底部操控懸浮列 -->
         <div class="ergonomic-bar">
             <button class="ergo-btn-circle" id="btn-card-prev" onclick="prevCard()" title="上一題">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
@@ -771,6 +608,7 @@ const RAW_QUESTIONS = [
 
 let masteredSet = new Set(JSON.parse(localStorage.getItem('mastered_questions_stage3') || '[]'));
 let wrongStats = JSON.parse(localStorage.getItem('wrong_stats_stage3') || '{}');
+let cardLastPositions = JSON.parse(localStorage.getItem('card_last_positions_stage3') || '{}');
 
 let quizList = [];
 let userAnswers = [];
@@ -787,15 +625,45 @@ let cardList = [];
 let cardIndex = 0;
 let isCardFlipped = false;
 let isClozeActive = false;
+let isReverseMode = false;
+let currentCardScope = 'unmastered';
 let autoPlayInterval = null;
 let isAnimating = false;
 let suppressClickUntil = 0;
+let studyStartTime = Date.now();
 
 function saveAllData() {
     localStorage.setItem('mastered_questions_stage3', JSON.stringify([...masteredSet]));
     localStorage.setItem('wrong_stats_stage3', JSON.stringify(wrongStats));
+    localStorage.setItem('card_last_positions_stage3', JSON.stringify(cardLastPositions));
     renderDashboard();
     checkAllMasteredCelebration();
+}
+
+// 學習打卡與計時
+function updateStudyStreak() {
+    const today = new Date().toISOString().slice(0, 10);
+    let streakData = JSON.parse(localStorage.getItem('study_streak_data') || '{"lastDate":"","days":0}');
+    if (streakData.lastDate !== today) {
+        const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+        if (streakData.lastDate === yesterday) {
+            streakData.days++;
+        } else if (streakData.lastDate !== today) {
+            streakData.days = 1;
+        }
+        streakData.lastDate = today;
+        localStorage.setItem('study_streak_data', JSON.stringify(streakData));
+    }
+    document.getElementById('study-streak-badge').textContent = `🔥 連續學習 ${streakData.days} 天`;
+}
+
+function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+    localStorage.setItem('dark_mode_enabled', document.body.classList.contains('dark-mode'));
+}
+
+if (localStorage.getItem('dark_mode_enabled') === 'true') {
+    document.body.classList.add('dark-mode');
 }
 
 function renderDashboard() {
@@ -813,6 +681,7 @@ function renderDashboard() {
     document.getElementById('dash-bar-easy').style.width = `${(easyM/36)*100}%`;
     document.getElementById('dash-bar-mid').style.width = `${(midM/36)*100}%`;
     document.getElementById('dash-bar-hard').style.width = `${(hardM/18)*100}%`;
+    updateStudyStreak();
 }
 
 function checkAllMasteredCelebration() {
@@ -842,6 +711,7 @@ function resetAllData() {
     if (confirm("確定要重設所有已熟記標記與錯題統計數據嗎？")) {
         masteredSet.clear();
         wrongStats = {};
+        cardLastPositions = {};
         saveAllData();
         renderDashboard();
         if (!document.getElementById('view-mastered').classList.contains('hidden')) renderMasteredList();
@@ -912,7 +782,7 @@ function getSelectedPool() {
         const count = Math.min(Math.max(1, parseInt(document.getElementById('input-count').value, 10) || 1), unmastered.length);
         selected = unmastered.slice(0, count);
     } else if (mode === 'all') {
-        const unmasteredPool = RAW_QUESTIONS.filter(x => !masteredSet.has(q.id));
+        const unmasteredPool = RAW_QUESTIONS.filter(x => !masteredSet.has(x.id));
         if (unmasteredPool.length === 0) {
             alert("🎉 所有題目均已熟記！");
             return null;
@@ -1287,8 +1157,11 @@ function restartQuiz() {
 }
 
 /* ========================================================
-   🎴 智慧字卡背誦系統（嚴格照題號排序 + 物理拖曳 + 點擊翻面無雙翻）
+   🎴 智慧字卡背誦系統（記憶進度 + 嚴格題號排序 + 反向對調 + SRS）
    ======================================================== */
+let currentFrontText = "";
+let currentBackText = "";
+
 function openFlashcardSetup() {
     document.getElementById('view-setup').classList.add('hidden');
     document.getElementById('view-quiz').classList.add('hidden');
@@ -1296,39 +1169,33 @@ function openFlashcardSetup() {
     document.getElementById('view-result').classList.add('hidden');
     document.getElementById('view-flashcard').classList.remove('hidden');
     
-    // 預設以未熟記題庫開始，嚴格依照題號由小至大排序
-    changeCardScope(document.getElementById('select-card-scope').value || 'unmastered');
+    const scope = document.getElementById('select-card-scope').value || 'unmastered';
+    changeCardScope(scope);
 }
 
 function changeCardScope(scope) {
+    currentCardScope = scope;
     let pool = [];
-    if (scope === 'all') {
+    if (scope === 'all') pool = [...RAW_QUESTIONS];
+    else if (scope === 'unmastered') pool = RAW_QUESTIONS.filter(q => !masteredSet.has(q.id));
+    else if (scope === 'wrong') pool = RAW_QUESTIONS.filter(q => (wrongStats[q.id] || 0) > 0);
+    else if (scope === 'easy') pool = RAW_QUESTIONS.filter(q => q.diff === 'easy');
+    else if (scope === 'mid') pool = RAW_QUESTIONS.filter(q => q.diff === 'mid');
+    else if (scope === 'hard') pool = RAW_QUESTIONS.filter(q => q.diff === 'hard');
+
+    if (pool.length === 0) {
+        alert("🎉 此分類無題目，已自動切換至全部總題庫。");
+        document.getElementById('select-card-scope').value = 'all';
         pool = [...RAW_QUESTIONS];
-    } else if (scope === 'unmastered') {
-        pool = RAW_QUESTIONS.filter(q => !masteredSet.has(q.id));
-        if (pool.length === 0) {
-            alert("🎉 所有題目均已標記熟記！已為您切換至「全部總題庫」。");
-            document.getElementById('select-card-scope').value = 'all';
-            pool = [...RAW_QUESTIONS];
-        }
-    } else if (scope === 'wrong') {
-        pool = RAW_QUESTIONS.filter(q => (wrongStats[q.id] || 0) > 0);
-        if (pool.length === 0) {
-            alert("👍 目前沒有任何常錯題目記錄！已為您切換至「全部總題庫」。");
-            document.getElementById('select-card-scope').value = 'all';
-            pool = [...RAW_QUESTIONS];
-        }
-    } else if (scope === 'easy') {
-        pool = RAW_QUESTIONS.filter(q => q.diff === 'easy');
-    } else if (scope === 'mid') {
-        pool = RAW_QUESTIONS.filter(q => q.diff === 'mid');
-    } else if (scope === 'hard') {
-        pool = RAW_QUESTIONS.filter(q => q.diff === 'hard');
     }
 
-    // 💡 關鍵：字卡模式嚴格按照題號 (id) 升冪排序排列！
+    // 💡 嚴格按照題號 (id) 升冪排序排列
     cardList = pool.sort((a, b) => a.id - b.id);
-    cardIndex = 0;
+    
+    // 💡 自動讀取上次看到的進度
+    const savedIdx = cardLastPositions[scope];
+    cardIndex = (typeof savedIdx === 'number' && savedIdx < cardList.length) ? savedIdx : 0;
+    
     isCardFlipped = false;
     isAnimating = false;
     renderCardContent();
@@ -1362,7 +1229,9 @@ function renderCardContent() {
     const item = cardList[cardIndex];
     isCardFlipped = false;
     
-    // 重設卡片位置與翻轉
+    cardLastPositions[currentCardScope] = cardIndex;
+    localStorage.setItem('card_last_positions_stage3', JSON.stringify(cardLastPositions));
+
     const card = document.getElementById('flashcard-card');
     const inner = document.getElementById('flashcard-inner');
     card.style.transition = 'none';
@@ -1372,12 +1241,23 @@ function renderCardContent() {
     document.getElementById('btn-toggle-reveal').textContent = "全部揭曉";
 
     document.getElementById('card-progress').textContent = `📝 題目 (${cardIndex + 1}/${cardList.length}) (#${item.id})`;
-    document.getElementById('card-q-text').textContent = item.q;
-    
-    if (isClozeActive) {
-        document.getElementById('card-a-text').innerHTML = generateClozeHtml(item.a);
+
+    if (isReverseMode) {
+        currentFrontText = item.a;
+        currentBackText = item.q;
+        document.getElementById('card-front-body').textContent = item.a;
+        document.getElementById('card-back-body').textContent = item.q;
+        document.getElementById('card-back-title').textContent = "💡 回想原題目";
     } else {
-        document.getElementById('card-a-text').textContent = item.a;
+        currentFrontText = item.q;
+        currentBackText = item.a;
+        document.getElementById('card-front-body').textContent = item.q;
+        if (isClozeActive) {
+            document.getElementById('card-back-body').innerHTML = generateClozeHtml(item.a);
+        } else {
+            document.getElementById('card-back-body').textContent = item.a;
+        }
+        document.getElementById('card-back-title').textContent = "💡 標準答案";
     }
 
     const diffMap = { easy: { label: "易", class: "diff-tag-easy" }, mid: { label: "中", class: "diff-tag-mid" }, hard: { label: "難", class: "diff-tag-hard" } };
@@ -1389,19 +1269,21 @@ function renderCardContent() {
     document.getElementById('btn-card-prev').disabled = (cardIndex === 0);
 }
 
-// 💡 乾淨翻面邏輯（徹底解決翻兩下問題）
+// 💡 完美防雙翻防抖機制
 function flipCard() {
     if (isAnimating) return;
     const now = Date.now();
     if (now < suppressClickUntil) return;
-    suppressClickUntil = now + 250; // 防抖 250ms
+    suppressClickUntil = now + 250;
 
     isCardFlipped = !isCardFlipped;
     const inner = document.getElementById('flashcard-inner');
     if (isCardFlipped) {
         inner.classList.add('is-flipped');
+        document.getElementById('srs-box').classList.remove('hidden');
     } else {
         inner.classList.remove('is-flipped');
+        document.getElementById('srs-box').classList.add('hidden');
     }
 }
 
@@ -1417,6 +1299,18 @@ function toggleAllBlanks() {
     btn.textContent = isAllRevealed ? "全部揭曉" : "全部隱藏";
 }
 
+function rateCard(level) {
+    const item = cardList[cardIndex];
+    if (level === 'hard') {
+        wrongStats[item.id] = (wrongStats[item.id] || 0) + 1;
+        masteredSet.delete(item.id);
+    } else if (level === 'easy') {
+        masteredSet.add(item.id);
+    }
+    saveAllData();
+    nextCard();
+}
+
 function animateSlideTo(direction, onComplete) {
     isAnimating = true;
     const card = document.getElementById('flashcard-card');
@@ -1429,7 +1323,6 @@ function animateSlideTo(direction, onComplete) {
 
     setTimeout(() => {
         onComplete();
-        // 從另一側滑入
         const startX = (direction === 'left') ? window.innerWidth * 0.9 : -window.innerWidth * 0.9;
         card.style.transition = 'none';
         card.style.transform = `translate(${startX}px, 0px) rotate(${(direction === 'left') ? 8 : -8}deg)`;
@@ -1446,6 +1339,7 @@ function animateSlideTo(direction, onComplete) {
 
 function prevCard() {
     if (isAnimating || cardIndex <= 0) return;
+    document.getElementById('srs-box').classList.add('hidden');
     animateSlideTo('right', () => {
         cardIndex--;
         renderCardContent();
@@ -1455,6 +1349,7 @@ function prevCard() {
 function nextCard() {
     if (isAnimating) return;
     if (cardIndex < cardList.length - 1) {
+        document.getElementById('srs-box').classList.add('hidden');
         animateSlideTo('left', () => {
             cardIndex++;
             renderCardContent();
@@ -1475,6 +1370,11 @@ function toggleCardMastered(isChecked) {
 
 function toggleClozeMode(isChecked) {
     isClozeActive = isChecked;
+    renderCardContent();
+}
+
+function toggleReverseMode(isChecked) {
+    isReverseMode = isChecked;
     renderCardContent();
 }
 
@@ -1520,7 +1420,7 @@ function speakText(text) {
 }
 
 /* ========================================================
-   👆 真實物理跟手拖曳滑動（Tinder/Anki 跟手動態）
+   👆 真實物理跟手拖曳滑動
    ======================================================== */
 const cardEl = document.getElementById('flashcard-card');
 let isDragging = false;
@@ -1552,7 +1452,6 @@ function onDragMove(clientX, clientY) {
         isMovedSignificantly = true;
     }
 
-    // 卡片跟隨手指移動與微旋轉
     const rotation = deltaX * 0.05;
     cardEl.style.transform = `translate(${deltaX}px, ${deltaY * 0.25}px) rotate(${rotation}deg)`;
     cardEl.style.opacity = Math.max(0.4, 1 - Math.abs(deltaX) / (window.innerWidth * 0.9));
@@ -1564,11 +1463,10 @@ function onDragEnd() {
     const deltaX = currentX - startX;
     const deltaY = currentY - startY;
 
-    // 若水平滑動距離大於 80px，觸發滑動換題
     if (Math.abs(deltaX) > 80 && Math.abs(deltaX) > Math.abs(deltaY) * 1.15) {
-        suppressClickUntil = Date.now() + 350; // 防止滑動結束觸發點擊翻面
+        suppressClickUntil = Date.now() + 350;
+        document.getElementById('srs-box').classList.add('hidden');
         if (deltaX < 0) {
-            // 左滑 -> 下一張
             if (cardIndex < cardList.length - 1) {
                 animateSlideTo('left', () => { cardIndex++; renderCardContent(); });
             } else {
@@ -1576,7 +1474,6 @@ function onDragEnd() {
                 exitFlashcards();
             }
         } else {
-            // 右滑 -> 上一張
             if (cardIndex > 0) {
                 animateSlideTo('right', () => { cardIndex--; renderCardContent(); });
             } else {
@@ -1585,10 +1482,8 @@ function onDragEnd() {
         }
     } else {
         if (!isMovedSignificantly) {
-            // 沒有滑動 -> 單純點擊翻面
             flipCard();
         } else {
-            // 滑動距離不夠 -> 彈性回彈原位
             springBack();
         }
     }
@@ -1600,7 +1495,6 @@ function springBack() {
     cardEl.style.opacity = '1';
 }
 
-// 觸控事件
 cardEl.addEventListener('touchstart', (e) => {
     if (e.target.classList.contains('cloze-blank') || e.target.closest('button')) return;
     onDragStart(e.touches[0].clientX, e.touches[0].clientY);
@@ -1616,7 +1510,6 @@ cardEl.addEventListener('touchend', (e) => {
     onDragEnd();
 });
 
-// 滑鼠拖曳事件（電腦版支援）
 cardEl.addEventListener('mousedown', (e) => {
     if (e.target.classList.contains('cloze-blank') || e.target.closest('button')) return;
     onDragStart(e.clientX, e.clientY);
@@ -1689,7 +1582,7 @@ function renderMasteredList() {
                     </label>
                 </div>
                 <div style="font-weight:600; font-size:0.95rem; margin-bottom:0.4rem;">${escapeHtml(item.q)}</div>
-                <div style="font-size:0.9rem; color:#334155; background:#f8fafc; padding:0.5rem; border-left:3px solid var(--primary); border-radius:4px;">${escapeHtml(item.a)}</div>
+                <div style="font-size:0.9rem; color:#334155; background:var(--primary-light); padding:0.5rem; border-left:3px solid var(--primary); border-radius:4px;">${escapeHtml(item.a)}</div>
             </div>
         `;
     }).join('');
