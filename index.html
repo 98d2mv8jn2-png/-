@@ -66,7 +66,7 @@
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 0.5rem;
-            margin-bottom: 1.25rem;
+            margin-bottom: 1.15rem;
         }
         .dash-card {
             background: var(--primary-light);
@@ -75,7 +75,7 @@
             text-align: center;
             border: 1px solid var(--border);
         }
-        .dash-title { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; margin-bottom: 2px; }
+        .dash-title { font-size: 0.72rem; color: var(--text-muted); font-weight: 600; margin-bottom: 2px; }
         .dash-val { font-size: 1.05rem; font-weight: 800; color: var(--primary); }
         .dash-bar-bg { background: var(--border); height: 5px; border-radius: 3px; margin-top: 4px; overflow: hidden; }
         .dash-bar-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s; }
@@ -205,8 +205,11 @@
             transform-style: preserve-3d;
             border-radius: 16px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            cursor: pointer;
+            cursor: grab;
+            will-change: transform, opacity;
         }
+        .flashcard:active { cursor: grabbing; }
+        
         .flashcard-inner {
             width: 100%;
             height: 100%;
@@ -239,13 +242,6 @@
             font-size: 1.05rem; line-height: 1.65; font-weight: 600; overflow-y: auto; padding: 0.5rem 0; word-break: break-word; user-select: text; -webkit-user-select: text;
         }
         .flashcard-hint { font-size: 0.78rem; color: var(--text-muted); text-align: center; user-select: none; }
-        
-        .cloze-blank {
-            background-color: #334155; color: transparent; border-radius: 4px; padding: 1px 6px; margin: 0 2px;
-            cursor: pointer; transition: all 0.2s; user-select: none; display: inline-block; box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-        }
-        .cloze-blank:hover { filter: brightness(1.25); }
-        .cloze-blank.revealed { background-color: #fef08a; color: #854d0e; font-weight: bold; box-shadow: inset 0 0 0 1px #eab308; }
 
         .ergonomic-bar {
             display: flex; align-items: center; justify-content: space-between; background: var(--card-bg);
@@ -477,11 +473,7 @@
                     <input type="checkbox" id="chk-reverse" onchange="toggleReverseMode(this.checked)">
                     <span>🔄 反向</span>
                 </label>
-                <label class="mastered-toggle" title="智慧挖空核心關鍵詞">
-                    <input type="checkbox" id="chk-cloze" onchange="toggleClozeMode(this.checked)">
-                    <span>🧠 挖空</span>
-                </label>
-                <label class="mastered-toggle">
+                <label class="mastered-toggle" title="已熟記標記">
                     <input type="checkbox" id="chk-card-mastered" onchange="toggleCardMastered(this.checked)">
                     <span>熟記</span>
                 </label>
@@ -509,10 +501,7 @@
                     <div class="flashcard-face flashcard-back">
                         <div class="flashcard-side-label">
                             <span id="card-back-title">💡 標準答案</span>
-                            <div style="display:flex; gap:0.5rem; align-items:center;">
-                                <button class="btn-text-sm" id="btn-toggle-reveal" onclick="event.stopPropagation(); toggleAllBlanks();" style="color:#0284c7;">全部揭曉</button>
-                                <button class="btn-text-sm" onclick="event.stopPropagation(); speakText(currentBackText);" style="color:var(--success);" title="語音朗讀">🔊 朗讀</button>
-                            </div>
+                            <button class="btn-text-sm" onclick="event.stopPropagation(); speakText(currentBackText);" style="color:var(--success);" title="語音朗讀">🔊 朗讀</button>
                         </div>
                         <div class="flashcard-body" id="card-back-body" style="font-weight:500;"></div>
                         <div class="flashcard-hint">👆 點擊卡片任意處翻回正面</div>
@@ -673,7 +662,7 @@ const RAW_QUESTIONS = [
     {"id": 81, "diff": "hard", "q": "依國軍各單位經管款項存款帳戶管制規定，試述單位承辦簽發國庫專戶存款支票人員調動時之處理程序？", "a": "（1）將經管支票存根、作廢支票、未簽發之空白支票及支票領取證等列入移交。（2）辦理國庫專戶印鑑更換（逕向國庫索取「國庫更換印鑑申請書」及新印鑑卡）。（3）向國庫申請存款餘額證明書。"},
     {"id": 82, "diff": "hard", "q": "依「國軍國內出差旅費報支規定」可申領旅費項目為何？並簡述之", "a": "（1）交通費：包括出差行程中必須搭乘之飛機、高鐵、船舶、火車、汽車、捷運、公共自行車等費用，均覈實報支；單位專備交通工具或出差人員領有免費票或搭乘便車者，不得報支交通費。搭乘飛機、高鐵、座（艙）位有分等之船舶、火車者，報支交通費時，應檢附票根或購票證明文件。駕駛自用汽車、機車出差者，其交通費得按必要路程之公里數（尾數不足一公里者，進位為一公里），汽車以每公里新臺幣三元、機車二元報支。（2）住宿費：出差地點距離單位所在地60公里以上，且有住宿事實者，得在依數額表所列基準內（平日：3,500元；假日：4,500元），檢據核實報支。（3）雜費：依實際行程達4小時以上得報支400元；未滿4小時者，得報支200元，不含提前出發及延後返回所需路程時間。"},
     {"id": 83, "diff": "hard", "q": "依國軍各單位經管款項存款帳戶管制規定第4條，試述單位撤銷或費款清結時之作業程序？", "a": "（1）結清存款帳戶。（2）連同未用剩餘空白國庫支票（含作廢支票）及支票領取證，加蓋作廢章後，應填具「國庫機關專戶存款銷戶通知書」（逕向國庫索取），加蓋全部印鑑章及正式印信，一併送交國庫銷戶。（3）單位銷戶完成取具「國庫帳戶銷戶回單」，持向財務單位登記單位國庫專戶基本資料異動。"},
-    {"id": 84, "diff": "hard", "q": "國軍各級單位強化墊借款管制作業原則為何？", "a": "妥適律定核判層級，依作業實需及財務業務集中現況妥適律定，避免因程序繁瑣影響承辦人員墊借意願，支出事項金額為五千元（不含）以上者，應優先以墊借方式辦理，若無墊借需求，須於申購時註記。"},
+    {"id": 84, "diff": "hard", "q": "國軍各級單位強化墊借款管制作業原則為何？", "a": "妥適律定核判層級，依作業實需及財務業務集中現況妥適律定，避免因程序繁瑣影響承辦人員墊借意願，支出事項金額為五千元（不含）以上者，應優先以墊借方式辦理，若無墊疑需求，須於申購時註記。"},
     {"id": 85, "diff": "hard", "q": "收領款收據因開具錯誤或收款事由消滅而作廢者，應如何處理？", "a": "（1）收領款收據因開具錯誤或收款事由消滅而作廢者，須於系統確實查填作廢原因。（2）由原開據單位收回後加蓋作廢章（一式二份）。（3）併同當月份會計報告妥存備查。"},
     {"id": 86, "diff": "hard", "q": "基層單位簽發國庫支票時，應設置何種簿冊，其注意事項為何？", "a": "支票簽發應設置「支票登記及現金檢查紀錄簿」，應由出納人員依使用情形逐筆登載於登記簿內（支票作廢亦應登載），並由各級印鑑保管人員於用印時，核對支票號碼、金額及受款人等資訊正確無誤後，於登記簿內簽名負責。"},
     {"id": 87, "diff": "hard", "q": "依國軍志願役軍官士官及志願士兵考績作業規定第117條規定，年度考績獎金核發標準為何？", "a": "核發基準：依考績核定當月（1月1日）所任職務之俸給總額（薪俸、專業加給及主管職務加給）按下列標準發給：（1）績等「甲等」以上者：發給一個月俸給總額；已晉至本階最高俸級者（含志願役上兵），發給二個月俸給總額。（2）績等「乙上」者：發給半個月俸給總額；已晉至本階最高俸級者（含志願役上兵），發給一個半月俸給總額。（3）績等「乙等」以下者：不核發考績獎金。"},
@@ -700,12 +689,12 @@ let currentBankFilter = 'all';
 let cardList = [];
 let cardIndex = 0;
 let isCardFlipped = false;
-let isClozeActive = false;
 let isReverseMode = false;
 let currentCardScope = 'unmastered';
 let autoPlayInterval = null;
 let isAnimating = false;
 let suppressClickUntil = 0;
+let studyStartTime = Date.now();
 
 function saveAllData() {
     localStorage.setItem('mastered_questions_stage3', JSON.stringify([...masteredSet]));
@@ -715,7 +704,6 @@ function saveAllData() {
     checkAllMasteredCelebration();
 }
 
-// 學習打卡與計時
 function updateStudyStreak() {
     const today = new Date().toISOString().slice(0, 10);
     let streakData = JSON.parse(localStorage.getItem('study_streak_data') || '{"lastDate":"","days":0}');
@@ -1273,31 +1261,7 @@ function changeCardScope(scope) {
     cardIndex = (typeof savedIdx === 'number' && savedIdx < cardList.length) ? savedIdx : 0;
     
     isCardFlipped = false;
-    isAnimating = false;
     renderCardContent();
-}
-
-function generateClozeHtml(text) {
-    const clozePatterns = [
-        /(\d+[,\d]*[萬億]?元)/g,
-        /(\d+[,\d]*[個]?工作日)/g,
-        /(\d+[,\d]*[個]?月[以內|以上]?)/g,
-        /(\d+[,\d]*[天日][以內|以上]?)/g,
-        /(\d+[,\d]*年[個]?月?)/g,
-        /(\d+[%％])/g,
-        /(\d+道以上)/g,
-        /(一次|半個月|一個月|二個月|四個月|一個半月)/g,
-        /(軍事投資|作業維持|人員維持|特別預算|總預算|借入款|主官行政費|原始憑證|記帳憑證|收入傳票|支出傳票|轉帳傳票|統計法|審計部|審計機關|統收統支)/g,
-        /(事前審核|事後複核|公開招標|選擇性招標|限制性招標|計畫分配|管制分配)/g,
-        /(編輯（出納）|審核（會計）|核定（主計主管）|放行（主官）)/g
-    ];
-
-    let result = text;
-    clozePatterns.forEach(pattern => {
-        result = result.replace(pattern, '<span class="cloze-blank" onclick="event.stopPropagation(); this.classList.toggle(\'revealed\');">$1</span>');
-    });
-
-    return result;
 }
 
 function renderCardContent() {
@@ -1308,10 +1272,13 @@ function renderCardContent() {
     cardLastPositions[currentCardScope] = cardIndex;
     localStorage.setItem('card_last_positions_stage3', JSON.stringify(cardLastPositions));
 
+    const card = document.getElementById('flashcard-card');
     const inner = document.getElementById('flashcard-inner');
+    card.style.transition = 'none';
+    card.style.transform = 'translate(0px, 0px) rotate(0deg)';
+    card.style.opacity = '1';
     inner.classList.remove('is-flipped');
     document.getElementById('srs-box').classList.add('hidden');
-    document.getElementById('btn-toggle-reveal').textContent = "全部揭曉";
 
     document.getElementById('card-progress').textContent = `📝 題目 (${cardIndex + 1}/${cardList.length}) (#${item.id})`;
 
@@ -1325,11 +1292,7 @@ function renderCardContent() {
         currentFrontText = item.q;
         currentBackText = item.a;
         document.getElementById('card-front-body').textContent = item.q;
-        if (isClozeActive) {
-            document.getElementById('card-back-body').innerHTML = generateClozeHtml(item.a);
-        } else {
-            document.getElementById('card-back-body').textContent = item.a;
-        }
+        document.getElementById('card-back-body').textContent = item.a;
         document.getElementById('card-back-title').textContent = "💡 標準答案";
     }
 
@@ -1342,8 +1305,12 @@ function renderCardContent() {
     document.getElementById('btn-card-prev').disabled = (cardIndex === 0);
 }
 
-// 💡 完美防雙翻防抖機制
+// 💡 乾淨翻面邏輯（徹底解決翻兩下問題）
 function flipCard() {
+    const now = Date.now();
+    if (now < suppressClickUntil) return;
+    suppressClickUntil = now + 250;
+
     isCardFlipped = !isCardFlipped;
     const inner = document.getElementById('flashcard-inner');
     if (isCardFlipped) {
@@ -1353,18 +1320,6 @@ function flipCard() {
         inner.classList.remove('is-flipped');
         document.getElementById('srs-box').classList.add('hidden');
     }
-}
-
-function toggleAllBlanks() {
-    const blanks = document.querySelectorAll('.cloze-blank');
-    const btn = document.getElementById('btn-toggle-reveal');
-    const isAllRevealed = Array.from(blanks).every(b => b.classList.contains('revealed'));
-    
-    blanks.forEach(b => {
-        if (isAllRevealed) b.classList.remove('revealed');
-        else b.classList.add('revealed');
-    });
-    btn.textContent = isAllRevealed ? "全部揭曉" : "全部隱藏";
 }
 
 function rateCard(level) {
@@ -1379,17 +1334,46 @@ function rateCard(level) {
     nextCard();
 }
 
+function animateSlideTo(direction, onComplete) {
+    const card = document.getElementById('flashcard-card');
+    const destX = (direction === 'left') ? -window.innerWidth * 1.1 : window.innerWidth * 1.1;
+    const rotate = (direction === 'left') ? -15 : 15;
+
+    card.style.transition = 'transform 0.25s ease-in, opacity 0.2s ease';
+    card.style.transform = `translate(${destX}px, 15px) rotate(${rotate}deg)`;
+    card.style.opacity = '0';
+
+    setTimeout(() => {
+        onComplete();
+        const startX = (direction === 'left') ? window.innerWidth * 0.8 : -window.innerWidth * 0.8;
+        card.style.transition = 'none';
+        card.style.transform = `translate(${startX}px, 0px) rotate(${(direction === 'left') ? 8 : -8}deg)`;
+        card.style.opacity = '0';
+
+        requestAnimationFrame(() => {
+            card.style.transition = 'transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.25), opacity 0.25s ease';
+            card.style.transform = 'translate(0px, 0px) rotate(0deg)';
+            card.style.opacity = '1';
+        });
+    }, 240);
+}
+
 function prevCard() {
-    if (cardIndex > 0) {
+    if (cardIndex <= 0) return;
+    document.getElementById('srs-box').classList.add('hidden');
+    animateSlideTo('right', () => {
         cardIndex--;
         renderCardContent();
-    }
+    });
 }
 
 function nextCard() {
     if (cardIndex < cardList.length - 1) {
-        cardIndex++;
-        renderCardContent();
+        document.getElementById('srs-box').classList.add('hidden');
+        animateSlideTo('left', () => {
+            cardIndex++;
+            renderCardContent();
+        });
     } else {
         alert("🎉 本題庫字卡已全部背誦完畢！");
         exitFlashcards();
@@ -1402,11 +1386,6 @@ function toggleCardMastered(isChecked) {
     if (isChecked) masteredSet.add(qId);
     else masteredSet.delete(qId);
     saveAllData();
-}
-
-function toggleClozeMode(isChecked) {
-    isClozeActive = isChecked;
-    renderCardContent();
 }
 
 function toggleReverseMode(isChecked) {
@@ -1454,6 +1433,109 @@ function speakText(text) {
         alert("您的瀏覽器不支援語音朗讀功能！");
     }
 }
+
+/* ========================================================
+   👆 真實物理跟手拖曳滑動
+   ======================================================== */
+const cardEl = document.getElementById('flashcard-card');
+let isDragging = false;
+let startX = 0;
+let startY = 0;
+let currentX = 0;
+let currentY = 0;
+let isMovedSignificantly = false;
+
+function onDragStart(clientX, clientY) {
+    isDragging = true;
+    isMovedSignificantly = false;
+    startX = clientX;
+    startY = clientY;
+    currentX = clientX;
+    currentY = clientY;
+    cardEl.style.transition = 'none';
+}
+
+function onDragMove(clientX, clientY) {
+    if (!isDragging) return;
+    currentX = clientX;
+    currentY = clientY;
+    const deltaX = currentX - startX;
+    const deltaY = currentY - startY;
+
+    if (Math.abs(deltaX) > 8 || Math.abs(deltaY) > 8) {
+        isMovedSignificantly = true;
+    }
+
+    const rotation = deltaX * 0.05;
+    cardEl.style.transform = `translate(${deltaX}px, ${deltaY * 0.25}px) rotate(${rotation}deg)`;
+    cardEl.style.opacity = Math.max(0.4, 1 - Math.abs(deltaX) / (window.innerWidth * 0.9));
+}
+
+function onDragEnd() {
+    if (!isDragging) return;
+    isDragging = false;
+    const deltaX = currentX - startX;
+    const deltaY = currentY - startY;
+
+    if (Math.abs(deltaX) > 75 && Math.abs(deltaX) > Math.abs(deltaY) * 1.1) {
+        suppressClickUntil = Date.now() + 350;
+        document.getElementById('srs-box').classList.add('hidden');
+        if (deltaX < 0) {
+            if (cardIndex < cardList.length - 1) {
+                animateSlideTo('left', () => { cardIndex++; renderCardContent(); });
+            } else {
+                alert("🎉 本題庫字卡已全部背誦完畢！");
+                exitFlashcards();
+            }
+        } else {
+            if (cardIndex > 0) {
+                animateSlideTo('right', () => { cardIndex--; renderCardContent(); });
+            } else {
+                springBack();
+            }
+        }
+    } else {
+        if (!isMovedSignificantly) {
+            flipCard();
+        } else {
+            springBack();
+        }
+    }
+}
+
+function springBack() {
+    cardEl.style.transition = 'transform 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.25), opacity 0.25s ease';
+    cardEl.style.transform = 'translate(0px, 0px) rotate(0deg)';
+    cardEl.style.opacity = '1';
+}
+
+cardEl.addEventListener('touchstart', (e) => {
+    if (e.target.closest('button')) return;
+    onDragStart(e.touches[0].clientX, e.touches[0].clientY);
+}, { passive: true });
+
+cardEl.addEventListener('touchmove', (e) => {
+    if (!isDragging) return;
+    onDragMove(e.touches[0].clientX, e.touches[0].clientY);
+}, { passive: true });
+
+cardEl.addEventListener('touchend', (e) => {
+    if (!isDragging) return;
+    onDragEnd();
+});
+
+cardEl.addEventListener('mousedown', (e) => {
+    if (e.target.closest('button')) return;
+    onDragStart(e.clientX, e.clientY);
+});
+
+window.addEventListener('mousemove', (e) => {
+    if (isDragging) onDragMove(e.clientX, e.clientY);
+});
+
+window.addEventListener('mouseup', () => {
+    if (isDragging) onDragEnd();
+});
 
 /* ========================================================
    📖 總題庫瀏覽與管理清單
