@@ -2,8 +2,8 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>財務士高班第三階段測驗與全功能衝刺系統</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>財務士高班第三階段測驗與智慧字卡系統</title>
     <style>
         :root {
             --primary: #1e3a8a;
@@ -29,6 +29,8 @@
             align-items: center;
             min-height: 100vh;
             padding: 1rem;
+            user-select: none;
+            -webkit-user-select: none;
         }
         .container {
             background-color: var(--card-bg);
@@ -71,6 +73,8 @@
             outline: none;
             background-color: #fff;
             transition: border-color 0.2s;
+            user-select: text;
+            -webkit-user-select: text;
         }
         select:focus, input[type="number"]:focus, textarea:focus { border-color: var(--primary); }
         textarea { resize: vertical; min-height: 110px; font-family: inherit; }
@@ -106,7 +110,7 @@
         .btn-success { background-color: var(--success); }
         .btn-success:hover { background-color: #166534; }
         .btn-purple { background-color: var(--purple); }
-        .btn-purple:hover { background-color: var(--purple-hover); }
+        .btn-purple:hover { background-color: --purple-hover; }
         .btn-danger { background-color: var(--danger); }
         .btn-danger:hover { background-color: #991b1b; }
         .btn-skip { background-color: #f1f5f9; color: #334155; border: 1px solid var(--border); }
@@ -183,10 +187,11 @@
         /* 🎴 3D 翻轉字卡專屬樣式 */
         .flashcard-scene {
             width: 100%;
-            height: 330px;
+            height: 340px;
             perspective: 1000px;
             margin: 0.8rem 0 1rem 0;
             cursor: pointer;
+            touch-action: pan-y;
         }
         .flashcard {
             width: 100%;
@@ -235,26 +240,32 @@
             overflow-y: auto;
             padding: 0.5rem 0;
             word-break: break-word;
+            user-select: text;
+            -webkit-user-select: text;
         }
         .flashcard-hint { font-size: 0.78rem; color: var(--text-muted); text-align: center; user-select: none; }
         
-        /* 挖空關鍵字樣式 */
+        /* 🧠 智慧挖空關鍵字樣式 */
         .cloze-blank {
             background-color: #334155;
-            color: #334155;
+            color: transparent;
             border-radius: 4px;
-            padding: 0 4px;
+            padding: 0 5px;
+            margin: 0 2px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             user-select: none;
+            display: inline-block;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
-        .cloze-blank:hover, .cloze-blank.revealed {
+        .cloze-blank:hover { filter: brightness(1.2); }
+        .cloze-blank.revealed {
             background-color: #fef08a;
             color: #854d0e;
             font-weight: bold;
+            box-shadow: inset 0 0 0 1px #eab308;
         }
 
-        /* 標籤分類 */
         .diff-tag { font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; font-weight: 700; }
         .diff-tag-easy { background-color: #dcfce7; color: #166534; }
         .diff-tag-mid { background-color: #fef3c7; color: #92400e; }
@@ -276,7 +287,6 @@
         .mastered-item-card { border: 1px solid var(--border); border-radius: 8px; padding: 0.85rem; background: #fff; }
         .mastered-item-card.is-mastered { border-color: #93c5fd; background-color: #f8fafc; }
         
-        /* 彈窗與通用面板 */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px);
@@ -284,12 +294,6 @@
         }
         .modal-card {
             background: #ffffff; border-radius: 14px; max-width: 500px; width: 100%; padding: 2rem; text-align: center;
-        }
-        .shortcut-hint {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-align: center;
-            margin-top: 0.6rem;
         }
         .hidden { display: none !important; }
         
@@ -308,7 +312,7 @@
 <div class="container">
     <!-- 主頁（設定與總覽） -->
     <div id="view-setup">
-        <h1>財務士高班第三階段測驗與字卡系統</h1>
+        <h1>財務士高班第三階段測驗與智慧字卡系統</h1>
         
         <!-- 掌握度儀表板 -->
         <div class="dashboard-grid">
@@ -455,30 +459,29 @@
             <button class="btn" id="btn-submit" onclick="submitAnswer()">提交答案</button>
             <button class="btn btn-success hidden" id="btn-next" onclick="nextQuestion()">下一題 ➡️</button>
         </div>
-        <div class="shortcut-hint">快捷鍵：Ctrl + Enter 快速提交</div>
 
         <div id="quiz-feedback" class="feedback hidden"></div>
     </div>
 
-    <!-- 🎴 字卡背誦畫面 -->
+    <!-- 🎴 智慧字卡背誦畫面（支援觸控滑動切換） -->
     <div id="view-flashcard" class="hidden">
         <div class="quiz-topbar">
             <div class="status-badge" id="card-progress" style="background:#ede9fe; color:#6d28d9;">字卡：1 / 30</div>
             <div class="quiz-topbar-right">
-                <label class="mastered-toggle" title="挖空關鍵詞與數字">
+                <label class="mastered-toggle" title="智慧挖空關鍵詞與核心數值">
                     <input type="checkbox" id="chk-cloze" onchange="toggleClozeMode(this.checked)">
-                    <span>🔲 關鍵字挖空</span>
+                    <span>🧠 智慧挖空</span>
                 </label>
                 <label class="mastered-toggle">
                     <input type="checkbox" id="chk-card-mastered" onchange="toggleCardMastered(this.checked)">
-                    <span>已熟記 (M)</span>
+                    <span>已熟記</span>
                 </label>
                 <button class="btn-text-sm" onclick="exitFlashcards()" style="font-weight:600; color:#475569;">🏠 主頁</button>
             </div>
         </div>
 
-        <!-- 3D 翻轉字卡 -->
-        <div class="flashcard-scene" onclick="flipCard()">
+        <!-- 3D 翻轉字卡主體（綁定滑動事件） -->
+        <div class="flashcard-scene" id="flashcard-touch-zone" onclick="handleCardClick(event)">
             <div class="flashcard" id="flashcard-card">
                 <!-- 正面 -->
                 <div class="flashcard-face flashcard-front">
@@ -490,28 +493,30 @@
                         </div>
                     </div>
                     <div class="flashcard-body" id="card-q-text"></div>
-                    <div class="flashcard-hint">👆 點擊卡片翻轉 (空白鍵 Space)</div>
+                    <div class="flashcard-hint">👆 點擊卡片翻面 ｜ 👈 左右滑動切換題目 👉</div>
                 </div>
                 <!-- 背面 -->
                 <div class="flashcard-face flashcard-back">
                     <div class="flashcard-side-label">
                         <span>💡 標準答案 (背面)</span>
-                        <button class="btn-text-sm" onclick="event.stopPropagation(); speakText(cardList[cardIndex].a);" style="color:#166534;" title="語音朗讀">🔊 朗讀答案</button>
+                        <div style="display:flex; gap:0.5rem; align-items:center;">
+                            <button class="btn-text-sm" id="btn-toggle-reveal" onclick="event.stopPropagation(); toggleAllBlanks();" style="color:#0284c7;">全部揭曉</button>
+                            <button class="btn-text-sm" onclick="event.stopPropagation(); speakText(cardList[cardIndex].a);" style="color:#166534;" title="語音朗讀">🔊 朗讀</button>
+                        </div>
                     </div>
                     <div class="flashcard-body" id="card-a-text" style="font-weight:500;"></div>
-                    <div class="flashcard-hint">👆 點擊卡片翻回正面 (點擊黃底可揭曉挖空)</div>
+                    <div class="flashcard-hint">👆 點擊卡片翻回正面 ｜ 👈 左右滑動切換題目 👉</div>
                 </div>
             </div>
         </div>
 
-        <!-- 字卡工具列 -->
+        <!-- 字卡控制工具列 -->
         <div class="quiz-btn-actions">
             <button class="btn btn-secondary" id="btn-card-prev" onclick="prevCard()" style="width: auto; min-width: 90px;">⬅️ 上張</button>
-            <button class="btn btn-purple" onclick="flipCard()">🔄 翻面 (Space)</button>
+            <button class="btn btn-purple" onclick="flipCard()">🔄 翻面</button>
             <button class="btn btn-secondary" id="btn-autoplay" onclick="toggleAutoPlay()" style="width: auto;">▶️ 自動輪播</button>
             <button class="btn btn-primary" id="btn-card-next" onclick="nextCard()">下張 ➡️</button>
         </div>
-        <div class="shortcut-hint">鍵盤支援：[空白鍵] 翻面 ｜ [← / →] 上下題 ｜ [M] 標記熟記</div>
     </div>
 
     <!-- 測驗結算畫面 -->
@@ -655,7 +660,6 @@ const RAW_QUESTIONS = [
     { id: 90, diff: "hard", q: "依國軍各單位經管款項存款帳戶管制規定第8條，國庫專戶存款支票印鑑必須有哪些人員蓋章，並負連帶責任？", a: "（1）單位主官或其職務代理人。（2）主辦主計（會計）人員或其職務代理人（非預算支用單位原則上以單位輔導長兼辦，無輔導長編制則由主官指派適合職務代理人兼辦）。（3）承辦簽發支票承辦人或其職務代理人。" }
 ];
 
-// 本地存儲數據
 let masteredSet = new Set(JSON.parse(localStorage.getItem('mastered_questions_stage3') || '[]'));
 let wrongStats = JSON.parse(localStorage.getItem('wrong_stats_stage3') || '{}');
 
@@ -790,7 +794,6 @@ function getSelectedPool() {
             ...getRandomSubarray(RAW_QUESTIONS.filter(x => x.diff === 'hard'), hardCount)
         ];
     } else if (mode === 'weakness') {
-        // 依照歷史錯誤次數排序，錯誤多的優先抽
         const unmastered = RAW_QUESTIONS.filter(q => !masteredSet.has(q.id));
         if (unmastered.length === 0) {
             alert("🎉 所有題目均已熟記！");
@@ -817,7 +820,6 @@ function getSelectedPool() {
             return null;
         }
     } else if (mode === 'exam') {
-        // 實戰模擬配題：易15、中10、難5
         selected = [
             ...getRandomSubarray(RAW_QUESTIONS.filter(x => x.diff === 'easy'), 15),
             ...getRandomSubarray(RAW_QUESTIONS.filter(x => x.diff === 'mid'), 10),
@@ -940,7 +942,6 @@ function showQuestion() {
 function giveHint() {
     const item = quizList[currentIndex];
     const hintBox = document.getElementById('hint-box');
-    // 提示前 8 個字或首條項目
     const snippet = item.a.length > 15 ? item.a.slice(0, 14) + "..." : item.a;
     hintBox.innerHTML = `<strong>💡 要點提示：</strong>開頭為「${snippet}」`;
     hintBox.classList.remove('hidden');
@@ -1177,7 +1178,7 @@ function restartQuiz() {
 }
 
 /* ========================================================
-   🎴 3D 翻轉字卡背誦系統
+   🎴 智慧字卡背誦系統（支援觸控左右滑動切換）
    ======================================================== */
 function startFlashcards() {
     const selected = getSelectedPool();
@@ -1196,10 +1197,28 @@ function startFlashcards() {
     showCard();
 }
 
+// 🧠 智慧關鍵字自動挖空演算法
 function generateClozeHtml(text) {
-    // 將金額、數字、天數或常見關鍵字轉為可點擊揭曉的黑塊
-    return text.replace(/(\d+[,\d]*[萬元個月天張筆道條項種度次]|特別預算|審計部|借入款|主官行政費|人員維持|作業維持|軍事投資)/g, 
-        '<span class="cloze-blank" onclick="event.stopPropagation(); this.classList.toggle(\'revealed\');">$1</span>');
+    const clozePatterns = [
+        /(\d+[,\d]*[萬億]?元)/g,
+        /(\d+[,\d]*[個]?工作日)/g,
+        /(\d+[,\d]*[個]?月[以內|以上]?)/g,
+        /(\d+[,\d]*[天日][以內|以上]?)/g,
+        /(\d+[,\d]*年[個]?月?)/g,
+        /(\d+[%％])/g,
+        /(\d+道以上)/g,
+        /(一次|半個月|一個月|二個月|四個月|一個半月)/g,
+        /(軍事投資|作業維持|人員維持|特別預算|總預算|借入款|主官行政費|原始憑證|記帳憑證|收入傳票|支出傳票|轉帳傳票|統計法|審計部|審計機關|統收統支)/g,
+        /(事前審核|事後複核|公開招標|選擇性招標|限制性招標|計畫分配|管制分配)/g,
+        /(編輯（出納）|審核（會計）|核定（主計主管）|放行（主官）)/g
+    ];
+
+    let result = text;
+    clozePatterns.forEach(pattern => {
+        result = result.replace(pattern, '<span class="cloze-blank" onclick="event.stopPropagation(); this.classList.toggle(\'revealed\');">$1</span>');
+    });
+
+    return result;
 }
 
 function showCard() {
@@ -1207,6 +1226,7 @@ function showCard() {
     const item = cardList[cardIndex];
     isCardFlipped = false;
     document.getElementById('flashcard-card').classList.remove('is-flipped');
+    document.getElementById('btn-toggle-reveal').textContent = "全部揭曉";
 
     document.getElementById('card-progress').textContent = `字卡：${cardIndex + 1} / ${cardList.length}`;
     document.getElementById('card-q-text').textContent = item.q;
@@ -1232,6 +1252,23 @@ function flipCard() {
     const card = document.getElementById('flashcard-card');
     if (isCardFlipped) card.classList.add('is-flipped');
     else card.classList.remove('is-flipped');
+}
+
+function handleCardClick(e) {
+    if (e.target.classList.contains('cloze-blank') || e.target.tagName === 'BUTTON') return;
+    flipCard();
+}
+
+function toggleAllBlanks() {
+    const blanks = document.querySelectorAll('.cloze-blank');
+    const btn = document.getElementById('btn-toggle-reveal');
+    const isAllRevealed = Array.from(blanks).every(b => b.classList.contains('revealed'));
+    
+    blanks.forEach(b => {
+        if (isAllRevealed) b.classList.remove('revealed');
+        else b.classList.add('revealed');
+    });
+    btn.textContent = isAllRevealed ? "全部揭曉" : "全部隱藏";
 }
 
 function prevCard() {
@@ -1301,35 +1338,45 @@ function speakText(text) {
 }
 
 /* ========================================================
-   ⌨️ 全局鍵盤快捷鍵
+   👆 手勢滑動監聽 (Touch Swipe Event Listener)
    ======================================================== */
-window.addEventListener('keydown', (e) => {
-    // 測驗模式：Ctrl+Enter 提交答案
-    if (!document.getElementById('view-quiz').classList.contains('hidden')) {
-        if (e.ctrlKey && e.key === 'Enter') {
-            const submitBtn = document.getElementById('btn-submit');
-            const nextBtn = document.getElementById('btn-next');
-            if (!submitBtn.classList.contains('hidden')) submitAnswer();
-            else if (!nextBtn.classList.contains('hidden')) nextQuestion();
-        }
-    }
+let touchStartX = 0;
+let touchStartY = 0;
+let touchEndX = 0;
+let touchEndY = 0;
+let isSwiping = false;
+
+const touchZone = document.getElementById('flashcard-touch-zone');
+
+touchZone.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+    touchStartY = e.changedTouches[0].screenY;
+    isSwiping = true;
+}, { passive: true });
+
+touchZone.addEventListener('touchend', (e) => {
+    if (!isSwiping) return;
+    touchEndX = e.changedTouches[0].screenX;
+    touchEndY = e.changedTouches[0].screenY;
+    handleSwipeGesture();
+    isSwiping = false;
+}, { passive: true });
+
+function handleSwipeGesture() {
+    const deltaX = touchEndX - touchStartX;
+    const deltaY = touchEndY - touchStartY;
     
-    // 字卡模式快捷鍵
-    if (!document.getElementById('view-flashcard').classList.contains('hidden')) {
-        if (e.code === 'Space') {
-            e.preventDefault();
-            flipCard();
-        } else if (e.key === 'ArrowRight') {
+    // 水平滑動距離大於 45px，且水平位移明顯大於垂直位移（避免與垂直滾動衝突）
+    if (Math.abs(deltaX) > 45 && Math.abs(deltaX) > Math.abs(deltaY) * 1.4) {
+        if (deltaX < 0) {
+            // 向左滑 -> 下一張
             nextCard();
-        } else if (e.key === 'ArrowLeft') {
+        } else {
+            // 向右滑 -> 上一張
             prevCard();
-        } else if (e.key === 'm' || e.key === 'M') {
-            const chk = document.getElementById('chk-card-mastered');
-            chk.checked = !chk.checked;
-            toggleCardMastered(chk.checked);
         }
     }
-});
+}
 
 /* ========================================================
    📖 總題庫瀏覽與管理清單
