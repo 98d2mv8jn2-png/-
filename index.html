@@ -275,7 +275,7 @@
         <div class="setup-group">
             <label for="select-match-rule">答案判定方式：</label>
             <select id="select-match-rule">
-                <option value="smart" selected>💡 寬鬆模式（要點字對即可，免編號標點、順序不拘）</option>
+                <option value="smart" selected>💡 寬鬆模式（字數與字全對、無標點；子題可不按順序，整段則需照順序）</option>
                 <option value="exact">🎯 嚴格模式（一字不漏，含編號/順序/標點；全半形皆可）</option>
             </select>
         </div>
@@ -841,7 +841,6 @@ function startQuiz() {
         let start = (parseInt(document.getElementById('custom-start').value, 10) || 1);
         let end = (parseInt(document.getElementById('custom-end').value, 10) || 100);
         if (start > end) [start, end] = [end, start];
-        // 自訂範圍維持直接過濾已熟記題目
         pool = RAW_QUESTIONS.filter(q => q.no >= start && q.no <= end && !masteredSet.has(q.no));
         if (pool.length === 0) {
             alert(`第 ${start} 至 ${end} 題區間內的題目已全部標記為熟記，無題目可測驗！`);
@@ -851,7 +850,6 @@ function startQuiz() {
         return;
     }
 
-    // 針對 1-50, 51-100, 全題庫隨機：根據使用者指定的題數隨機抽選
     const count = Math.min(Math.max(1, requestedCount), pool.length);
     const selected = getRandomSubarray(pool, count);
     initQuizSession(selected);
@@ -969,7 +967,6 @@ function showQuestion() {
         feedbackBox.classList.add('hidden');
         btnSubmit.classList.remove('hidden');
         
-        // 已熟記的題目顯示「偷看答案」按鈕
         if (peekBtn) {
             if (isMastered) peekBtn.classList.remove('hidden');
             else peekBtn.classList.add('hidden');
@@ -1016,18 +1013,29 @@ function submitAnswer() {
         const sNorm = normalizeStr(stdVal);
         isCorrect = (uNorm === sNorm);
     } else {
+        // 💡 寬鬆模式最終版：
+        // 1. 去除標點、空白後，總字數必須完全一致。
+        // 2. 若標準答案含有子題（如（1）、（2）...），則可不按順序填寫，只要各子題字元數與內容全對即可。
+        // 3. 若為一般整段文字（無子題），則必須字字對應且順序完全正確。
         const uNorm = normalizeStr(userVal);
         const sNorm = normalizeStr(stdVal);
-        const points = stdVal.split(/(?=[（(][0-9一二三四五六七八九十]+[）)])/g).filter(p => p.trim().length > 0);
-        if (points.length > 1) {
-            let matchedCount = 0;
-            points.forEach(pt => {
-                const ptNorm = normalizeStr(pt);
-                if (ptNorm.length > 0 && uNorm.includes(ptNorm.slice(0, Math.min(6, ptNorm.length)))) matchedCount++;
-            });
-            isCorrect = (matchedCount >= Math.ceil(points.length * 0.75));
+
+        if (uNorm.length === sNorm.length) {
+            const stdPoints = stdVal.split(/(?=[（(][0-9一二三四五六七八九十]+[）)])/g).filter(p => p.trim().length > 0);
+            if (stdPoints.length > 1) {
+                // 有子題：檢查每一塊子題正規化後是否有在使用者答案中出現（不拘順序，且總字數已確認一致）
+                let allMatched = true;
+                stdPoints.forEach(pt => {
+                    const ptNorm = normalizeStr(pt);
+                    if (!uNorm.includes(ptNorm)) allMatched = false;
+                });
+                isCorrect = allMatched;
+            } else {
+                // 純文字段落：字數相同、標點忽略下，直接比對內容順序
+                isCorrect = (uNorm === sNorm);
+            }
         } else {
-            isCorrect = (uNorm.length > 0 && (sNorm.includes(uNorm) || uNorm.includes(sNorm) || uNorm.length >= sNorm.length * 0.8));
+            isCorrect = false;
         }
     }
 
